@@ -14,4 +14,8 @@ public class UserService {
     public List<User> getAllUsers() {
         return userMapper.getAllUsers();
     }
+    // UserService.java
+    public void updateUser(User user) {
+        userMapper.updateUser(user);  // 调用 Mapper 的方法
+    }
 }

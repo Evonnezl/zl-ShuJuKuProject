@@ -5,8 +5,21 @@
 
 <mapper namespace="org.example.housebackend.mapper.UserMapper">
 
+    <!-- 查询所有 -->
     <select id="getAllUsers" resultType="org.example.housebackend.entity.User">
         SELECT * FROM user
     </select>
+
+    <!-- 更新用户 -->
+    <update id="updateUser">
+        UPDATE user
+        <set>
+            <if test="status != null">status = #{status}</if>
+            <if test="name != null">name = #{name}</if>
+            <if test="phone != null">phone = #{phone}</if>
+            <if test="email != null">email = #{email}</if>
+        </set>
+        WHERE id = #{id}
+    </update>
 
 </mapper>
