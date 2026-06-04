@@ -17,21 +17,27 @@ public class ApplicationController {
         this.applicationService = applicationService;
     }
 
-    // 查询所有申请
+    // 获取所有申请
     @GetMapping
-    public List<Application> list() {
+    public List<Application> getAll() {
         return applicationService.getAll();
     }
 
-    // 添加申请
-    @PostMapping
-    public void add(@RequestBody Application application) {
-        applicationService.insert(application);
+    // 分房：更新状态为 APPROVED 并分配房屋
+    @PutMapping("/{id}/approve")
+    public void approve(@PathVariable Integer id) {
+        applicationService.approve(id);
     }
 
-    // 更新申请状态
-    @PutMapping
-    public void update(@RequestBody Application application) {
-        applicationService.updateStatus(application);
+    // 调房：更新状态为 APPROVED 并调换房屋
+    @PutMapping("/{id}/transfer")
+    public void transfer(@PathVariable Integer id) {
+        applicationService.transfer(id);
+    }
+
+    // 退房：更新状态为 APPROVED 并释放房屋
+    @PutMapping("/{id}/release")
+    public void release(@PathVariable Integer id) {
+        applicationService.release(id);
     }
 }

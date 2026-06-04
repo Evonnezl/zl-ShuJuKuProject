@@ -12,4 +12,5 @@ public interface HouseMapper {
 
     List<House> getAll();
     void updateHouse(House house);
+    House getById(Integer id);
 }

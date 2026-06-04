@@ -10,4 +10,6 @@ public interface ApplicationMapper {
     List<Application> getAll();
     void insert(Application application);
     void updateStatus(Application application);
+    Application getById(Integer id);
+    void update(Application application);
 }
