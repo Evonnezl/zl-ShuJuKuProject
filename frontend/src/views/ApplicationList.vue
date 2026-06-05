@@ -8,12 +8,15 @@
 
       <div class="form-row">
         <label>申请人</label>
-        <select v-model="form.userId">
+        <select v-model="form.userId" @change="onUserChange">
           <option value="">-- 请选择申请人 --</option>
-          <option v-for="u in users" :key="u.id" :value="u.id">
+          <option v-for="u in availableUsers" :key="u.id" :value="u.id">
             {{ u.name }}（{{ u.role === 'tenant' ? '住户' : '管理员' }}）
           </option>
         </select>
+        <span v-if="form.type && availableUsers.length === 0" class="hint">
+          {{ form.type === 'ALLOCATE' ? '（所有用户均已有住房）' : '（没有用户拥有住房）' }}
+        </span>
       </div>
 
       <div class="form-row">
@@ -159,6 +162,7 @@ export default {
       list: [],
       users: [],
       houses: [],
+      records: [],
       form: {
         userId: '',
         type: '',
@@ -175,10 +179,36 @@ export default {
   },
 
   computed: {
-    // 已分配的房屋（用于调房原房选择和退房选择）
+    // 拥有住房的用户ID集合
+    hasHouseUserIds() {
+      return new Set(this.records.map(r => r.userId))
+    },
+
+    // 根据申请类型过滤可选申请人
+    availableUsers() {
+      if (!this.form.type) return this.users
+      if (this.form.type === 'ALLOCATE') {
+        // 分房：只显示没有住房的人
+        return this.users.filter(u => !this.hasHouseUserIds.has(u.id))
+      }
+      // 调房/退房：只显示有住房的人
+      return this.users.filter(u => this.hasHouseUserIds.has(u.id))
+    },
+
+    // 已分配房屋
     allocatedHouses() {
       return this.houses.filter(h => h.status === '已分配')
     },
+
+    // 当前选中用户的住房（用于调房/退房自动匹配）
+    userHouses() {
+      if (!this.form.userId) return []
+      const userRecordIds = this.records
+        .filter(r => r.userId === this.form.userId)
+        .map(r => r.houseId)
+      return this.allocatedHouses.filter(h => userRecordIds.includes(h.id))
+    },
+
     canSubmit() {
       const f = this.form
       if (!f.userId || !f.type) return false
@@ -198,6 +228,16 @@ export default {
     this.loadApps()
     this.loadUsers()
     this.loadHouses()
+    this.loadRecords()
+  },
+
+  watch: {
+    // 切类型时重置申请人
+    'form.type'() {
+      this.form.userId = ''
+      this.form.houseId = null
+      this.form.originalHouseId = null
+    }
   },
 
   methods: {
@@ -222,9 +262,26 @@ export default {
         .catch(err => console.error('加载房屋失败', err))
     },
 
+    loadRecords() {
+      fetch('http://localhost:8080/records')
+        .then(res => res.json())
+        .then(data => { this.records = data })
+        .catch(err => console.error('加载住房记录失败', err))
+    },
+
     getUserName(userId) {
       const u = this.users.find(u => u.id === userId)
       return u ? u.name : userId
+    },
+
+    // 选完申请人后，调房/退房自动匹配其住房
+    onUserChange() {
+      if (this.form.type === 'TRANSFER' && this.userHouses.length > 0) {
+        this.form.originalHouseId = this.userHouses[0].id
+      }
+      if (this.form.type === 'RETURN' && this.userHouses.length > 0) {
+        this.form.houseId = this.userHouses[0].id
+      }
     },
 
     submit() {
@@ -252,7 +309,13 @@ export default {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       })
-        .then(res => res.json())
+        .then(async res => {
+          if (!res.ok) {
+            const err = await res.json()
+            throw new Error(err.message || '请求失败')
+          }
+          return res.json()
+        })
         .then(() => {
           this.msg = '✅ 申请提交成功！'
           this.resetForm()
@@ -261,7 +324,7 @@ export default {
         })
         .catch(err => {
           console.error('提交失败', err)
-          this.msg = '❌ 提交失败，请检查后端是否启动'
+          this.msg = '❌ ' + err.message
         })
     },
 

@@ -42,10 +42,40 @@ public class ApplicationService {
         return applicationMapper.getById(id);
     }
 
+    /**
+     * 新增申请，含业务校验：
+     * - 分房：已有住房的用户不能申请
+     * - 调房/退房：没有住房的用户不能申请
+     */
     public void insert(Application app) {
         if (app.getStatus() == null) {
             app.setStatus("PENDING");
         }
+
+        // 查该用户是否已有住房
+        boolean hasHouse = housingRecordMapper.getAll().stream()
+                .anyMatch(r -> r.getUserId().equals(app.getUserId()));
+
+        if ("ALLOCATE".equals(app.getType())) {
+            if (hasHouse) {
+                throw new RuntimeException("该用户已有住房，不能申请分房");
+            }
+        }
+
+        if ("TRANSFER".equals(app.getType()) || "RETURN".equals(app.getType())) {
+            if (!hasHouse) {
+                throw new RuntimeException("该用户没有住房，不能申请调房或退房");
+            }
+        }
+
+        // 调房：自动补全原住房面积
+        if ("TRANSFER".equals(app.getType()) && app.getOriginalHouseId() != null) {
+            House oldHouse = houseMapper.getById(app.getOriginalHouseId());
+            if (oldHouse != null) {
+                app.setOriginalHouseArea(oldHouse.getArea());
+            }
+        }
+
         applicationMapper.insert(app);
     }
 

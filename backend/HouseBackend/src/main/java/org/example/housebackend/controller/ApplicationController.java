@@ -4,7 +4,10 @@ import org.example.housebackend.entity.Application;
 import org.example.housebackend.service.ApplicationService;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.http.ResponseEntity;
+
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/applications")
@@ -25,9 +28,13 @@ public class ApplicationController {
 
     // 新增申请
     @PostMapping
-    public Application insert(@RequestBody Application app) {
-        applicationService.insert(app);
-        return app;
+    public ResponseEntity<?> insert(@RequestBody Application app) {
+        try {
+            applicationService.insert(app);
+            return ResponseEntity.ok(app);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
     }
 
     // 分房：更新状态为 APPROVED 并分配房屋
