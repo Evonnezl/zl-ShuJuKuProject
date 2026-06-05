@@ -33,7 +33,22 @@
       <template v-if="form.type === 'ALLOCATE' || form.type === 'TRANSFER'">
         <div class="form-row">
           <label>部门</label>
-          <input v-model="form.department" placeholder="如：计算机学院" />
+          <select v-model="form.department">
+            <option value="">-- 请选择部门 --</option>
+            <option value="计算机学院">计算机学院</option>
+            <option value="电子信息学院">电子信息学院</option>
+            <option value="数学与统计学院">数学与统计学院</option>
+            <option value="物理学院">物理学院</option>
+            <option value="化学学院">化学学院</option>
+            <option value="生命科学学院">生命科学学院</option>
+            <option value="经济管理学院">经济管理学院</option>
+            <option value="法学院">法学院</option>
+            <option value="外国语学院">外国语学院</option>
+            <option value="马克思主义学院">马克思主义学院</option>
+            <option value="后勤集团">后勤集团</option>
+            <option value="图书馆">图书馆</option>
+            <option value="校机关">校机关</option>
+          </select>
         </div>
         <div class="form-row">
           <label>职称</label>
@@ -77,7 +92,22 @@
       <template v-if="form.type === 'RETURN'">
         <div class="form-row">
           <label>部门</label>
-          <input v-model="form.department" placeholder="如：计算机学院" />
+          <select v-model="form.department">
+            <option value="">-- 请选择部门 --</option>
+            <option value="计算机学院">计算机学院</option>
+            <option value="电子信息学院">电子信息学院</option>
+            <option value="数学与统计学院">数学与统计学院</option>
+            <option value="物理学院">物理学院</option>
+            <option value="化学学院">化学学院</option>
+            <option value="生命科学学院">生命科学学院</option>
+            <option value="经济管理学院">经济管理学院</option>
+            <option value="法学院">法学院</option>
+            <option value="外国语学院">外国语学院</option>
+            <option value="马克思主义学院">马克思主义学院</option>
+            <option value="后勤集团">后勤集团</option>
+            <option value="图书馆">图书馆</option>
+            <option value="校机关">校机关</option>
+          </select>
         </div>
         <div class="form-row">
           <label>退房房号</label>

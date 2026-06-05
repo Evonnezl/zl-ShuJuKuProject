@@ -267,12 +267,16 @@ public class ApplicationService {
         // 部门基础分
         if (app.getDepartment() != null) {
             String dept = app.getDepartment();
-            if (dept.contains("计算机") || dept.contains("重点")) {
+            if (dept.equals("计算机学院") || dept.equals("电子信息学院")) {
                 score += 30;
-            } else if (dept.contains("学院") || dept.contains("系")) {
+            } else if (dept.equals("数学与统计学院") || dept.equals("物理学院")
+                    || dept.equals("化学学院") || dept.equals("生命科学学院")) {
+                score += 25;
+            } else if (dept.equals("经济管理学院") || dept.equals("法学院")
+                    || dept.equals("外国语学院") || dept.equals("马克思主义学院")) {
                 score += 20;
             } else {
-                score += 10;
+                score += 15;
             }
         }
 
