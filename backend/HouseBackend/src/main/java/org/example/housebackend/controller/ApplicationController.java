@@ -23,6 +23,13 @@ public class ApplicationController {
         return applicationService.getAll();
     }
 
+    // 新增申请
+    @PostMapping
+    public Application insert(@RequestBody Application app) {
+        applicationService.insert(app);
+        return app;
+    }
+
     // 分房：更新状态为 APPROVED 并分配房屋
     @PutMapping("/{id}/approve")
     public void approve(@PathVariable Integer id) {

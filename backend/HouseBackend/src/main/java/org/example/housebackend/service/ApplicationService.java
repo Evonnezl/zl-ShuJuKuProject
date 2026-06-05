@@ -42,6 +42,13 @@ public class ApplicationService {
         return applicationMapper.getById(id);
     }
 
+    public void insert(Application app) {
+        if (app.getStatus() == null) {
+            app.setStatus("PENDING");
+        }
+        applicationMapper.insert(app);
+    }
+
     // ==================== 分房（核心） ====================
 
     /**
