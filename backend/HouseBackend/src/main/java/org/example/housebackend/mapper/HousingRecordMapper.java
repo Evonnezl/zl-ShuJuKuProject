@@ -10,5 +10,11 @@ public interface HousingRecordMapper {
 
     List<HousingRecord> getAll();
 
+    HousingRecord getById(Integer id);
+
     void insert(HousingRecord record);
+
+    void update(HousingRecord record);
+
+    void deleteById(Integer id);
 }

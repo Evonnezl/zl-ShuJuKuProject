@@ -19,7 +19,19 @@ public class HousingRecordService {
         return mapper.getAll();
     }
 
+    public HousingRecord getById(Integer id) {
+        return mapper.getById(id);
+    }
+
     public void insert(HousingRecord record) {
         mapper.insert(record);
+    }
+
+    public void update(HousingRecord record) {
+        mapper.update(record);
+    }
+
+    public void deleteById(Integer id) {
+        mapper.deleteById(id);
     }
 }

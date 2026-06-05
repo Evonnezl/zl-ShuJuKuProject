@@ -9,4 +9,12 @@ import java.util.List;
 public interface HousingStandardMapper {
 
     List<HousingStandard> getAll();
+
+    HousingStandard getById(Integer id);
+
+    void insert(HousingStandard standard);
+
+    void update(HousingStandard standard);
+
+    void deleteById(Integer id);
 }

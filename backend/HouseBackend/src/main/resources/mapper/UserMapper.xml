@@ -5,21 +5,35 @@
 
 <mapper namespace="org.example.housebackend.mapper.UserMapper">
 
-    <!-- 查询所有 -->
     <select id="getAllUsers" resultType="org.example.housebackend.entity.User">
-        SELECT * FROM user
+        SELECT id, name, role, phone, email
+        FROM user
     </select>
 
-    <!-- 更新用户 -->
+    <select id="getById" resultType="org.example.housebackend.entity.User">
+        SELECT id, name, role, phone, email
+        FROM user
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insertUser">
+        INSERT INTO user(name, role, phone, email)
+        VALUES (#{name}, #{role}, #{phone}, #{email})
+    </insert>
+
     <update id="updateUser">
         UPDATE user
         <set>
-            <if test="status != null">status = #{status}</if>
-            <if test="name != null">name = #{name}</if>
-            <if test="phone != null">phone = #{phone}</if>
-            <if test="email != null">email = #{email}</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="role != null">role = #{role},</if>
+            <if test="phone != null">phone = #{phone},</if>
+            <if test="email != null">email = #{email},</if>
         </set>
         WHERE id = #{id}
     </update>
+
+    <delete id="deleteById">
+        DELETE FROM user WHERE id = #{id}
+    </delete>
 
 </mapper>

@@ -14,6 +14,7 @@ public class Application {
     private Integer score;
     private Double requestArea;
     private Integer originalHouseId;
+    private Double originalHouseArea;
     private LocalDateTime createTime;
 
     // getter & setter
@@ -49,6 +50,9 @@ public class Application {
 
     public Integer getOriginalHouseId() { return originalHouseId; }
     public void setOriginalHouseId(Integer originalHouseId) { this.originalHouseId = originalHouseId; }
+
+    public Double getOriginalHouseArea() { return originalHouseArea; }
+    public void setOriginalHouseArea(Double originalHouseArea) { this.originalHouseArea = originalHouseArea; }
 
     public LocalDateTime getCreateTime() { return createTime; }
     public void setCreateTime(LocalDateTime createTime) { this.createTime = createTime; }

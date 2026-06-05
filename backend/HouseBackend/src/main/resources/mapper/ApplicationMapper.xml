@@ -6,18 +6,39 @@
 <mapper namespace="org.example.housebackend.mapper.ApplicationMapper">
 
     <select id="getAll" resultType="org.example.housebackend.entity.Application">
-        SELECT id, user_id, house_id, type, status, department, title_level, family_size, score, request_area, original_house_id, create_time
+        SELECT id, user_id, house_id, type, status, department, title_level,
+               family_size, score, request_area, original_house_id, original_house_area, create_time
         FROM application
     </select>
 
+    <select id="getById" resultType="org.example.housebackend.entity.Application">
+        SELECT id, user_id, house_id, type, status, department, title_level,
+               family_size, score, request_area, original_house_id, original_house_area, create_time
+        FROM application
+        WHERE id = #{id}
+    </select>
+
     <insert id="insert">
-        INSERT INTO application(user_id, house_id, type, status, department, title_level, family_size, score, request_area, original_house_id, create_time)
-        VALUES (#{userId}, #{houseId}, #{type}, #{status}, #{department}, #{titleLevel}, #{familySize}, #{score}, #{requestArea}, #{originalHouseId}, #{createTime})
+        INSERT INTO application(user_id, house_id, type, status, department, title_level,
+                                family_size, score, request_area, original_house_id, original_house_area, create_time)
+        VALUES (#{userId}, #{houseId}, #{type}, #{status}, #{department}, #{titleLevel},
+                #{familySize}, #{score}, #{requestArea}, #{originalHouseId}, #{originalHouseArea}, #{createTime})
     </insert>
 
-    <update id="updateStatus">
+    <update id="update">
         UPDATE application
-        SET status = #{status}
+        <set>
+            <if test="houseId != null">house_id = #{houseId},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="department != null">department = #{department},</if>
+            <if test="titleLevel != null">title_level = #{titleLevel},</if>
+            <if test="familySize != null">family_size = #{familySize},</if>
+            <if test="score != null">score = #{score},</if>
+            <if test="requestArea != null">request_area = #{requestArea},</if>
+            <if test="originalHouseId != null">original_house_id = #{originalHouseId},</if>
+            <if test="originalHouseArea != null">original_house_area = #{originalHouseArea},</if>
+        </set>
         WHERE id = #{id}
     </update>
 

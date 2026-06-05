@@ -17,13 +17,16 @@ public class HouseController {
         this.houseService = houseService;
     }
 
-    // 查询所有房屋
     @GetMapping
     public List<House> list() {
         return houseService.getAll();
     }
 
-    // 分房/退房（更新状态）
+    @GetMapping("/{id}")
+    public House getById(@PathVariable Integer id) {
+        return houseService.getById(id);
+    }
+
     @PutMapping
     public void update(@RequestBody House house) {
         houseService.update(house);

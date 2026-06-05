@@ -6,9 +6,14 @@
       <thead>
         <tr>
           <th>ID</th>
-          <th>用户ID</th>
-          <th>房屋ID</th>
-          <th>分数</th>
+          <th>户主</th>
+          <th>部门</th>
+          <th>职称</th>
+          <th>家庭人口</th>
+          <th>住房分数</th>
+          <th>房号</th>
+          <th>住房面积（㎡）</th>
+          <th>月租金（元）</th>
           <th>入住日期</th>
         </tr>
       </thead>
@@ -16,9 +21,14 @@
       <tbody>
         <tr v-for="item in list" :key="item.id">
           <td>{{ item.id }}</td>
-          <td>{{ item.userId }}</td>
-          <td>{{ item.houseId }}</td>
+          <td>{{ item.userName }}</td>
+          <td>{{ item.department }}</td>
+          <td>{{ item.titleLevel }}</td>
+          <td>{{ item.familySize }}</td>
           <td>{{ item.score }}</td>
+          <td>{{ item.houseTitle }}</td>
+          <td>{{ item.houseArea }}</td>
+          <td>{{ item.rentAmount }}</td>
           <td>{{ item.moveInDate }}</td>
         </tr>
       </tbody>
@@ -50,3 +60,16 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+table {
+  border-collapse: collapse;
+  width: 95%;
+  margin-top: 20px;
+}
+
+th, td {
+  padding: 8px;
+  text-align: center;
+}
+</style>

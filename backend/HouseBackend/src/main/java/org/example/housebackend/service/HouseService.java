@@ -15,12 +15,14 @@ public class HouseService {
         this.houseMapper = houseMapper;
     }
 
-    // 获取所有房屋
     public List<House> getAll() {
         return houseMapper.getAll();
     }
 
-    // 更新房屋状态
+    public House getById(Integer id) {
+        return houseMapper.getById(id);
+    }
+
     public void update(House house) {
         houseMapper.updateHouse(house);
     }
