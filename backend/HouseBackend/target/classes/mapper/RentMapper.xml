@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.example.housebackend.mapper.RentMapper">
+
+    <select id="getAll" resultType="org.example.housebackend.entity.Rent">
+        SELECT id, user_id, house_id, rent_amount, rent_date
+        FROM rent
+    </select>
+
+    <select id="getById" resultType="org.example.housebackend.entity.Rent">
+        SELECT id, user_id, house_id, rent_amount, rent_date
+        FROM rent
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO rent(user_id, house_id, rent_amount, rent_date)
+        VALUES (#{userId}, #{houseId}, #{rentAmount}, #{rentDate})
+    </insert>
+
+    <delete id="deleteByHouseId">
+        DELETE FROM rent WHERE house_id = #{houseId}
+    </delete>
+
+    <delete id="deleteById">
+        DELETE FROM rent WHERE id = #{id}
+    </delete>
+
+</mapper>
