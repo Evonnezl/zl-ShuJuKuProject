@@ -167,11 +167,7 @@ export default {
 }
 .login-page::before {
   content: ''; position: fixed; inset: 0; z-index: -1;
-  background: url('/zlzl.jpg') center / cover no-repeat;
-}
-.login-page::after {
-  content: ''; position: fixed; inset: 0; z-index: -1;
-  background: rgba(0,0,0,.25);
+  background: linear-gradient(135deg, #0a0418 0%, #0f172a 30%, #0c1929 60%, #0a0418 100%);
 }
 .login-card {
   background: rgba(255,255,255,.78);

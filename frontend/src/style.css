@@ -87,14 +87,10 @@ body {
   100% { opacity: 1; }
 }
 
-/* 自定义背景图片 + 暗化遮罩 */
+/* 深色星空背景 */
 body::before {
   content: ''; position: fixed; inset: 0; z-index: -1;
-  background: url('/zlzl.jpg') center / cover no-repeat;
-}
-body::after {
-  content: ''; position: fixed; inset: 0; z-index: -1;
-  background: rgba(0, 0, 0, .25);
+  background: linear-gradient(135deg, #0a0418 0%, #0f172a 30%, #0c1929 60%, #0a0418 100%);
 }
 
 /* ----- 顶部导航栏 ----- */
