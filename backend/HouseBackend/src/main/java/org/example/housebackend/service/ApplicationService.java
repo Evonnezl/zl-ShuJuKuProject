@@ -130,7 +130,7 @@ public class ApplicationService {
         List<House> gradeHouses = findHousesInGrade(matchedStandard);
         if (gradeHouses.isEmpty()) {
             result.put("success", false);
-            result.put("message", "该等级（" + matchedStandard.getArea() + "㎡级别）暂无空房，申请保持待审批状态");
+            result.put("message", "该等级（" + matchedStandard.getMinArea() + "~" + matchedStandard.getMaxArea() + "㎡）暂无空房，申请保持待审批状态");
             return result;
         }
 
@@ -323,53 +323,35 @@ public class ApplicationService {
     }
 
     /**
-     * 查找属于指定住房标准等级的空房
-     * 等级范围：该标准面积与上一级标准面积之间的房屋
-     * 返回按面积从大到小排列
+     * 查找属于指定住房标准等级的空房，按面积从大到小排列
      */
     private List<House> findHousesInGrade(HousingStandard standard) {
-        List<HousingStandard> standards = housingStandardMapper.getAll();
-        standards.sort(Comparator.comparingDouble(HousingStandard::getArea));
-
-        // 确定该等级的面积下限（上一级标准的面积，第一级下限为 0）
-        double lower = 0;
-        for (int i = 0; i < standards.size(); i++) {
-            if (standards.get(i).getId().equals(standard.getId())) {
-                if (i > 0) {
-                    lower = standards.get(i - 1).getArea();
-                }
-                break;
-            }
-        }
-
-        final double lowerBound = lower;
-        final double upperBound = standard.getArea();
+        final double lo = standard.getMinArea();
+        final double hi = standard.getMaxArea();
 
         return houseMapper.getAll().stream()
                 .filter(h -> "空房".equals(h.getStatus()))
-                .filter(h -> h.getArea() > lowerBound && h.getArea() <= upperBound)
+                .filter(h -> h.getArea() > lo && h.getArea() <= hi)
                 .sorted(Comparator.comparingDouble(House::getArea).reversed())
                 .toList();
     }
 
     /**
-     * 查找对应面积的住房标准（取面积最接近且 ≥ 申请面积的档位）
+     * 查找对应面积的住房标准（申请面积落在哪个等级范围内）
      */
     private HousingStandard findStandard(Double requestArea) {
         if (requestArea == null) return null;
 
         List<HousingStandard> standards = housingStandardMapper.getAll();
-        // 按面积升序排列
-        standards.sort(Comparator.comparingDouble(HousingStandard::getArea));
+        standards.sort(Comparator.comparingDouble(HousingStandard::getMaxArea));
 
-        // 找到第一个面积 ≥ 申请面积的档位
         for (HousingStandard std : standards) {
-            if (std.getArea() >= requestArea) {
+            if (requestArea > std.getMinArea() && requestArea <= std.getMaxArea()) {
                 return std;
             }
         }
 
-        // 如果申请面积超过所有标准，取最大标准
+        // 申请面积超出所有标准，取最大
         return standards.isEmpty() ? null : standards.get(standards.size() - 1);
     }
 }

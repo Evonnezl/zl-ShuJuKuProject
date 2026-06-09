@@ -22,9 +22,11 @@
     </select>
 
     <select id="getThresholdByArea" resultType="int">
+        <![CDATA[
         SELECT min_score FROM housing_standard
-        WHERE area = #{area}
+        WHERE #{area} > min_area AND #{area} <= max_area
         LIMIT 1
+        ]]>
     </select>
 
     <select id="getRentPerM2ByHouseTitle" resultType="double">
