@@ -139,7 +139,6 @@ body::before {
 
 .page-wrap {
   max-width: 1200px; margin: 0 auto; padding: 28px 32px 60px;
-  animation: slideUp .5s var(--transition);
 }
 
 @keyframes slideUp {

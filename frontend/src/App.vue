@@ -58,7 +58,7 @@ function logout() {
         <span class="logout-btn" @click="logout">退出</span>
       </div>
     </nav>
-    <div class="page-wrap" :key="page">
+    <div class="page-wrap">
       <HouseList v-if="page === 'house'" />
       <ApplicationList v-if="page === 'application'" />
       <UserList v-if="page === 'user'" />
