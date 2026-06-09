@@ -372,17 +372,32 @@ export default {
     },
     approve(item) {
       fetch(`http://localhost:8080/applications/${item.id}/approve`, { method: 'PUT' })
-        .then(() => { this.loadApps(); this.loadHouses(); this.loadRecords() })
+        .then(res => res.json())
+        .then(data => {
+          this.loadApps(); this.loadHouses(); this.loadRecords()
+          this.msg = data.success ? '[OK] ' + data.message : '[提示] ' + data.message
+          setTimeout(() => { this.msg = '' }, 5000)
+        })
         .catch(err => console.error(err))
     },
     transfer(item) {
       fetch(`http://localhost:8080/applications/${item.id}/transfer`, { method: 'PUT' })
-        .then(() => { this.loadApps(); this.loadHouses() })
+        .then(res => res.json())
+        .then(data => {
+          this.loadApps(); this.loadHouses(); this.loadRecords()
+          this.msg = data.success ? '[OK] ' + data.message : '[提示] ' + data.message
+          setTimeout(() => { this.msg = '' }, 5000)
+        })
         .catch(err => console.error(err))
     },
     release(item) {
       fetch(`http://localhost:8080/applications/${item.id}/release`, { method: 'PUT' })
-        .then(() => { this.loadApps(); this.loadHouses() })
+        .then(res => res.json())
+        .then(data => {
+          this.loadApps(); this.loadHouses(); this.loadRecords()
+          this.msg = data.success ? '[OK] ' + data.message : '[提示] ' + data.message
+          setTimeout(() => { this.msg = '' }, 5000)
+        })
         .catch(err => console.error(err))
     }
   }

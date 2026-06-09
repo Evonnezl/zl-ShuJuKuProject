@@ -37,21 +37,21 @@ public class ApplicationController {
         }
     }
 
-    // 分房：更新状态为 APPROVED 并分配房屋
+    // 分房
     @PutMapping("/{id}/approve")
-    public void approve(@PathVariable Integer id) {
-        applicationService.approve(id);
+    public Map<String, Object> approve(@PathVariable Integer id) {
+        return applicationService.approve(id);
     }
 
-    // 调房：更新状态为 APPROVED 并调换房屋
+    // 调房
     @PutMapping("/{id}/transfer")
-    public void transfer(@PathVariable Integer id) {
-        applicationService.transfer(id);
+    public Map<String, Object> transfer(@PathVariable Integer id) {
+        return applicationService.transfer(id);
     }
 
-    // 退房：更新状态为 APPROVED 并释放房屋
+    // 退房
     @PutMapping("/{id}/release")
-    public void release(@PathVariable Integer id) {
-        applicationService.release(id);
+    public Map<String, Object> release(@PathVariable Integer id) {
+        return applicationService.release(id);
     }
 }

@@ -6,7 +6,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class ApplicationService {
@@ -92,11 +94,15 @@ public class ApplicationService {
      * 7. 计算房租写入 rent 表
      * 8. 更新申请状态为 APPROVED
      */
-    public void approve(Integer id) {
+    public Map<String, Object> approve(Integer id) {
+        Map<String, Object> result = new HashMap<>();
+
         // 1. 获取申请
         Application app = applicationMapper.getById(id);
         if (app == null || !"PENDING".equals(app.getStatus())) {
-            return;
+            result.put("success", false);
+            result.put("message", "申请不存在或状态不是待审批");
+            return result;
         }
 
         // 2. 计算分数（题目：根据申请者情况计算其分数）
@@ -106,23 +112,26 @@ public class ApplicationService {
         // 3. 阈值校验：查找对应面积的住房标准
         HousingStandard matchedStandard = findStandard(app.getRequestArea());
         if (matchedStandard == null) {
-            // 没有匹配的标准，拒绝
             app.setStatus("REJECTED");
             applicationMapper.update(app);
-            return;
+            result.put("success", false);
+            result.put("message", "未找到匹配的住房标准，申请已拒绝");
+            return result;
         }
         if (calculatedScore < matchedStandard.getMinScore()) {
-            // 分数不够，拒绝
             app.setStatus("REJECTED");
             applicationMapper.update(app);
-            return;
+            result.put("success", false);
+            result.put("message", "分数不足（得分" + calculatedScore + "，需要" + matchedStandard.getMinScore() + "），申请已拒绝");
+            return result;
         }
 
         // 4. 在同等级空房中查找，好房优先（按面积从大到小排列）
         List<House> gradeHouses = findHousesInGrade(matchedStandard);
         if (gradeHouses.isEmpty()) {
-            // 该等级没有空房，申请保持 PENDING 等待
-            return;
+            result.put("success", false);
+            result.put("message", "该等级（" + matchedStandard.getArea() + "㎡级别）暂无空房，申请保持待审批状态");
+            return result;
         }
 
         // 分配该等级内最优空房（面积最大的）
@@ -167,6 +176,11 @@ public class ApplicationService {
         app.setHouseId(bestHouse.getId());
         app.setStatus("APPROVED");
         applicationMapper.update(app);
+
+        result.put("success", true);
+        result.put("message", "分房成功！分配 " + bestHouse.getTitle()
+                + "（" + bestHouse.getArea() + "㎡），月租金 " + String.format("%.2f", rentAmount) + " 元");
+        return result;
     }
 
     // ==================== 调房 ====================
@@ -178,10 +192,11 @@ public class ApplicationService {
      * 3. 释放原住房
      * 4. 分配新房（复用分房逻辑）
      */
-    public void transfer(Integer id) {
+    public Map<String, Object> transfer(Integer id) {
         Application app = applicationMapper.getById(id);
         if (app == null || !"PENDING".equals(app.getStatus())) {
-            return;
+            Map<String, Object> r = new HashMap<>();
+            r.put("success", false); r.put("message", "申请不存在或状态异常"); return r;
         }
 
         // 释放原住房
@@ -205,7 +220,7 @@ public class ApplicationService {
         }
 
         // 分配新房（调用分房逻辑）
-        approve(id);
+        return approve(id);
     }
 
     // ==================== 退房 ====================
@@ -217,15 +232,17 @@ public class ApplicationService {
      * 3. 房屋标记为空房
      * 4. 更新申请状态
      */
-    public void release(Integer id) {
+    public Map<String, Object> release(Integer id) {
         Application app = applicationMapper.getById(id);
         if (app == null || !"PENDING".equals(app.getStatus())) {
-            return;
+            Map<String, Object> r = new HashMap<>();
+            r.put("success", false); r.put("message", "申请不存在或状态异常"); return r;
         }
 
         Integer houseId = app.getHouseId();
         if (houseId == null) {
-            return;
+            Map<String, Object> r = new HashMap<>();
+            r.put("success", false); r.put("message", "未关联房屋"); return r;
         }
 
         // 删除住房记录
@@ -249,6 +266,11 @@ public class ApplicationService {
         // 更新申请状态
         app.setStatus("APPROVED");
         applicationMapper.update(app);
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("success", true);
+        result.put("message", "退房成功，房屋 " + house.getTitle() + " 已释放");
+        return result;
     }
 
     // ==================== 辅助方法 ====================
