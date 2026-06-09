@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, provide, shallowRef } from 'vue'
+import { ref, computed, provide } from 'vue'
 import Login from './views/Login.vue'
 import HouseList from './views/HouseList.vue'
 import ApplicationList from './views/ApplicationList.vue'
@@ -12,16 +12,15 @@ const saved = sessionStorage.getItem('user')
 const user = ref(saved ? JSON.parse(saved) : null)
 provide('user', user)
 
-const components = { HouseList, ApplicationList, UserList, HousingRecordList, HousingStandardList, Stats }
-const page = ref(user.value ? 'ApplicationList' : null)
+const page = ref(user.value ? 'application' : null)
 
 const allNavItems = [
-  { key: 'ApplicationList', label: '申请管理', adminOnly: false },
-  { key: 'HouseList',       label: '房屋管理', adminOnly: true },
-  { key: 'UserList',        label: '用户管理', adminOnly: true },
-  { key: 'HousingRecordList', label: '住房记录', adminOnly: false },
-  { key: 'HousingStandardList', label: '住房标准', adminOnly: true },
-  { key: 'Stats',           label: '统计查询', adminOnly: true },
+  { key: 'application', label: '申请管理', adminOnly: false },
+  { key: 'house',       label: '房屋管理', adminOnly: true },
+  { key: 'user',        label: '用户管理', adminOnly: true },
+  { key: 'record',      label: '住房记录', adminOnly: false },
+  { key: 'standard',    label: '住房标准', adminOnly: true },
+  { key: 'stats',       label: '统计查询', adminOnly: true },
 ]
 
 const navItems = computed(() => {
@@ -33,7 +32,7 @@ const navItems = computed(() => {
 function onLogin(u) {
   user.value = u
   sessionStorage.setItem('user', JSON.stringify(u))
-  page.value = 'ApplicationList'
+  page.value = 'application'
 }
 
 function logout() {
@@ -60,14 +59,13 @@ function logout() {
       </div>
     </nav>
 
-    <Transition name="fade" mode="out-in">
-      <component :is="components[page]" :key="page" />
-    </Transition>
+    <div class="page-wrap">
+      <HouseList v-if="page === 'house'" />
+      <ApplicationList v-if="page === 'application'" />
+      <UserList v-if="page === 'user'" />
+      <HousingRecordList v-if="page === 'record'" />
+      <HousingStandardList v-if="page === 'standard'" />
+      <Stats v-if="page === 'stats'" />
+    </div>
   </div>
 </template>
-
-<style>
-.fade-enter-active { transition: opacity .2s ease; }
-.fade-leave-active { transition: opacity .15s ease; }
-.fade-enter-from, .fade-leave-to { opacity: 0; }
-</style>
