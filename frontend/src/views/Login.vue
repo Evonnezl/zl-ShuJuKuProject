@@ -169,6 +169,10 @@ export default {
   content: ''; position: fixed; inset: 0; z-index: -1;
   background: url('/bg.jpg') center / cover no-repeat;
 }
+.login-page::after {
+  content: ''; position: fixed; inset: 0; z-index: -1;
+  background: rgba(0,0,0,.45);
+}
 .login-card {
   background: rgba(255,255,255,.78);
   backdrop-filter: blur(20px) saturate(150%);
@@ -181,7 +185,7 @@ export default {
 .login-header { text-align: center; margin-bottom: 24px; }
 .login-header h1 {
   font-size: 24px;
-  background: linear-gradient(135deg, #b794f4, #7c5ce7);
+  background: linear-gradient(135deg, #34d399, #059669);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   background-clip: text;
   margin: 0 0 4px; letter-spacing: 2px;
@@ -193,6 +197,6 @@ export default {
   font-size: 15px; color: #9b8dab; transition: all .2s;
   border-bottom: 2px solid transparent; margin-bottom: -2px;
 }
-.tab.active { color: #7c5ce7; font-weight: 600; border-bottom-color: #7c5ce7; }
-.tab:hover { color: #7c5ce7; }
+.tab.active { color: #059669; font-weight: 600; border-bottom-color: #059669; }
+.tab:hover { color: #059669; }
 </style>

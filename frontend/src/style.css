@@ -4,9 +4,9 @@
 
 /* ----- CSS 变量 ----- */
 :root {
-  --primary: #7c5ce7;
-  --primary-hover: #6a4bd4;
-  --primary-light: rgba(124, 92, 231, .12);
+  --primary: #059669;
+  --primary-hover: #047857;
+  --primary-light: rgba(5, 150, 105, .12);
   --success: #2ed573;
   --success-light: rgba(46, 213, 115, .12);
   --warning: #ffa502;
@@ -87,10 +87,14 @@ body {
   100% { opacity: 1; }
 }
 
-/* 自定义背景图片 */
+/* 自定义背景图片 + 暗化遮罩 */
 body::before {
   content: ''; position: fixed; inset: 0; z-index: -1;
   background: url('/bg.jpg') center / cover no-repeat;
+}
+body::after {
+  content: ''; position: fixed; inset: 0; z-index: -1;
+  background: rgba(0, 0, 0, .45);
 }
 
 /* ----- 顶部导航栏 ----- */
@@ -107,7 +111,7 @@ body::before {
 
 .top-nav .logo {
   font-size: 17px; font-weight: 700;
-  background: linear-gradient(135deg, #b794f4, #7c5ce7);
+  background: linear-gradient(135deg, #34d399, #059669);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   background-clip: text;
   letter-spacing: 1px;
