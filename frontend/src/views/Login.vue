@@ -167,11 +167,11 @@ export default {
 }
 .login-page::before {
   content: ''; position: fixed; inset: 0; z-index: -1;
-  background: url('/bg.jpg') center / cover no-repeat;
+  background: url('/zlzl.jpg') center / cover no-repeat;
 }
 .login-page::after {
   content: ''; position: fixed; inset: 0; z-index: -1;
-  background: rgba(0,0,0,.45);
+  background: rgba(0,0,0,.25);
 }
 .login-card {
   background: rgba(255,255,255,.78);
@@ -185,18 +185,18 @@ export default {
 .login-header { text-align: center; margin-bottom: 24px; }
 .login-header h1 {
   font-size: 24px;
-  background: linear-gradient(135deg, #34d399, #059669);
+  background: linear-gradient(135deg, #60a5fa, #3b82f6);
   -webkit-background-clip: text; -webkit-text-fill-color: transparent;
   background-clip: text;
   margin: 0 0 4px; letter-spacing: 2px;
 }
-.login-sub { font-size: 12px; color: #9b8dab; letter-spacing: 2px; }
+.login-sub { font-size: 12px; color: #94a3b8; letter-spacing: 2px; }
 .tab-bar { display: flex; margin-bottom: 20px; border-bottom: 2px solid rgba(0,0,0,.06); }
 .tab {
   flex: 1; text-align: center; padding: 10px; cursor: pointer;
-  font-size: 15px; color: #9b8dab; transition: all .2s;
+  font-size: 15px; color: #94a3b8; transition: all .2s;
   border-bottom: 2px solid transparent; margin-bottom: -2px;
 }
-.tab.active { color: #059669; font-weight: 600; border-bottom-color: #059669; }
-.tab:hover { color: #059669; }
+.tab.active { color: #3b82f6; font-weight: 600; border-bottom-color: #3b82f6; }
+.tab:hover { color: #3b82f6; }
 </style>
