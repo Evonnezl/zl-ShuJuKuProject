@@ -43,11 +43,13 @@
       <div class="card-title">快捷操作</div>
       <div style="display:flex; gap:12px; flex-wrap:wrap;">
         <button class="btn btn-primary" @click="$emit('nav','application')">申请管理</button>
-        <button class="btn btn-outline" @click="$emit('nav','house')">房屋管理</button>
         <button class="btn btn-outline" @click="$emit('nav','record')">住房记录</button>
-        <button class="btn btn-outline" @click="$emit('nav','standard')">住房标准</button>
-        <button class="btn btn-outline" @click="$emit('nav','stats')">统计查询</button>
-        <button class="btn btn-outline" @click="$emit('nav','user')">用户管理</button>
+        <template v-if="user.role === 'admin'">
+          <button class="btn btn-outline" @click="$emit('nav','house')">房屋管理</button>
+          <button class="btn btn-outline" @click="$emit('nav','standard')">住房标准</button>
+          <button class="btn btn-outline" @click="$emit('nav','stats')">统计查询</button>
+          <button class="btn btn-outline" @click="$emit('nav','user')">用户管理</button>
+        </template>
       </div>
     </div>
 

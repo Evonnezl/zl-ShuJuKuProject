@@ -37,7 +37,12 @@ function onLogin(u) {
   page.value = 'dashboard'
 }
 
-function goNav(key) { page.value = key }
+function goNav(key) {
+  if (user.value.role !== 'admin' && allNavItems.find(n => n.key === key)?.adminOnly) {
+    page.value = 'dashboard'; return
+  }
+  page.value = key
+}
 
 function logout() {
   user.value = null; page.value = null
