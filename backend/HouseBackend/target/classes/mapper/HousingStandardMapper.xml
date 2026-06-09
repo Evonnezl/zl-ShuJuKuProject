@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.example.housebackend.mapper.HousingStandardMapper">
+
+    <select id="getAll" resultType="org.example.housebackend.entity.HousingStandard">
+        SELECT id, area, min_score
+        FROM housing_standard
+    </select>
+
+    <select id="getById" resultType="org.example.housebackend.entity.HousingStandard">
+        SELECT id, area, min_score
+        FROM housing_standard
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert">
+        INSERT INTO housing_standard(area, min_score)
+        VALUES (#{area}, #{minScore})
+    </insert>
+
+    <update id="update">
+        UPDATE housing_standard
+        <set>
+            <if test="area != null">area = #{area},</if>
+            <if test="minScore != null">min_score = #{minScore},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM housing_standard WHERE id = #{id}
+    </delete>
+
+</mapper>

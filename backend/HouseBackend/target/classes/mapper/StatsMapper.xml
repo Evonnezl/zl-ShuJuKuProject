@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.example.housebackend.mapper.StatsMapper">
+
+    <select id="countEmptyHouses" resultType="int">
+        SELECT COUNT(*) FROM house WHERE status = '空房'
+    </select>
+
+    <select id="countAllocatedHouses" resultType="int">
+        SELECT COUNT(*) FROM house WHERE status = '已分配'
+    </select>
+
+    <select id="countApplications" resultType="int">
+        SELECT COUNT(*) FROM application
+    </select>
+
+    <select id="getMinThresholdScore" resultType="int">
+        SELECT MIN(min_score) FROM housing_standard
+    </select>
+
+    <select id="getThresholdByArea" resultType="int">
+        SELECT min_score FROM housing_standard
+        WHERE area = #{area}
+        LIMIT 1
+    </select>
+
+    <select id="getRentPerM2ByHouseTitle" resultType="double">
+        SELECT rent_per_m2 FROM house
+        WHERE title = #{title}
+        LIMIT 1
+    </select>
+
+    <select id="getHouseRentInfo" resultType="map">
+        SELECT h.id, h.title, h.area, h.rent_per_m2, h.status,
+               (h.area * h.rent_per_m2) AS monthly_rent
+        FROM house h
+        ORDER BY h.id
+    </select>
+
+    <select id="getHousingSummary" resultType="map">
+        SELECT
+            COUNT(*) AS total_houses,
+            SUM(CASE WHEN status = '空房' THEN 1 ELSE 0 END) AS empty_count,
+            SUM(CASE WHEN status = '已分配' THEN 1 ELSE 0 END) AS allocated_count,
+            SUM(area) AS total_area,
+            AVG(rent_per_m2) AS avg_rent_per_m2
+        FROM house
+    </select>
+
+</mapper>

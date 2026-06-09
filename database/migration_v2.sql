@@ -56,3 +56,13 @@ ALTER TABLE application    ADD INDEX idx_app_status (status);
 ALTER TABLE application    ADD INDEX idx_app_type_status (type, status);
 ALTER TABLE housing_record ADD INDEX idx_record_user (user_id);
 ALTER TABLE rent           ADD INDEX idx_rent_house (house_id);
+
+-- ============================================
+-- 5. user 表新增密码列（登录系统）
+-- ============================================
+ALTER TABLE user ADD COLUMN password VARCHAR(100) COMMENT 'BCrypt密码';
+
+-- 设置默认密码（BCrypt 加密：admin123 / 123456）
+-- 注意：如果用户已存在，需要手动执行以下 UPDATE：
+-- UPDATE user SET password = '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy' WHERE name = '张三';
+-- UPDATE user SET password = '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy' WHERE name = '李四';

@@ -118,19 +118,15 @@ public class ApplicationService {
             return;
         }
 
-        // 4. 查找空房，好房优先（按面积从大到小排列）
-        List<House> emptyHouses = houseMapper.getAll().stream()
-                .filter(h -> "空房".equals(h.getStatus()))
-                .sorted(Comparator.comparingDouble(House::getArea).reversed())
-                .toList();
-
-        if (emptyHouses.isEmpty()) {
-            // 没有空房，申请保持 PENDING 等待
+        // 4. 在同等级空房中查找，好房优先（按面积从大到小排列）
+        List<House> gradeHouses = findHousesInGrade(matchedStandard);
+        if (gradeHouses.isEmpty()) {
+            // 该等级没有空房，申请保持 PENDING 等待
             return;
         }
 
-        // 分配最优空房（面积最大的）
-        House bestHouse = emptyHouses.get(0);
+        // 分配该等级内最优空房（面积最大的）
+        House bestHouse = gradeHouses.get(0);
 
         // 5. 创建住房记录（题目要求：户主、部门、职称、家庭人口、住房分数、房号、住房面积）
         User user = userMapper.getById(app.getUserId());
@@ -302,6 +298,36 @@ public class ApplicationService {
         }
 
         return score;
+    }
+
+    /**
+     * 查找属于指定住房标准等级的空房
+     * 等级范围：该标准面积与上一级标准面积之间的房屋
+     * 返回按面积从大到小排列
+     */
+    private List<House> findHousesInGrade(HousingStandard standard) {
+        List<HousingStandard> standards = housingStandardMapper.getAll();
+        standards.sort(Comparator.comparingDouble(HousingStandard::getArea));
+
+        // 确定该等级的面积下限（上一级标准的面积，第一级下限为 0）
+        double lower = 0;
+        for (int i = 0; i < standards.size(); i++) {
+            if (standards.get(i).getId().equals(standard.getId())) {
+                if (i > 0) {
+                    lower = standards.get(i - 1).getArea();
+                }
+                break;
+            }
+        }
+
+        final double lowerBound = lower;
+        final double upperBound = standard.getArea();
+
+        return houseMapper.getAll().stream()
+                .filter(h -> "空房".equals(h.getStatus()))
+                .filter(h -> h.getArea() > lowerBound && h.getArea() <= upperBound)
+                .sorted(Comparator.comparingDouble(House::getArea).reversed())
+                .toList();
     }
 
     /**

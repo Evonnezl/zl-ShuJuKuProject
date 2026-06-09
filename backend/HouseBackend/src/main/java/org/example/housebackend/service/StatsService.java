@@ -23,7 +23,7 @@ public class StatsService {
         map.put("applicationCount", statsMapper.countApplications());
         map.put("thresholdScore", statsMapper.getMinThresholdScore());
         map.put("houseRentInfo", statsMapper.getHouseRentInfo());
-        map.put("housingSummary", statsMapper.getHousingSummary());
+        map.put("housingSummary", getHousingSummary());
         return map;
     }
 

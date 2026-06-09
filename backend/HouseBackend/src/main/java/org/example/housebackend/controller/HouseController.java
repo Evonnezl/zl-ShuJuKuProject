@@ -27,8 +27,9 @@ public class HouseController {
         return houseService.getById(id);
     }
 
-    @PutMapping
-    public void update(@RequestBody House house) {
+    @PutMapping("/{id}")
+    public void update(@PathVariable Integer id, @RequestBody House house) {
+        house.setId(id);
         houseService.update(house);
     }
 }

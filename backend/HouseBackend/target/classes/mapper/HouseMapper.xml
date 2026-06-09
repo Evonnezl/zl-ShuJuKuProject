@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.example.housebackend.mapper.HouseMapper">
+
+    <select id="getAll" resultType="org.example.housebackend.entity.House">
+        SELECT id, title, status, area, rent_per_m2
+        FROM house
+    </select>
+
+    <select id="getById" resultType="org.example.housebackend.entity.House">
+        SELECT id, title, status, area, rent_per_m2
+        FROM house
+        WHERE id = #{id}
+    </select>
+
+    <update id="updateHouse">
+        UPDATE house
+        <set>
+            <if test="title != null">title = #{title},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="area != null">area = #{area},</if>
+            <if test="rentPerM2 != null">rent_per_m2 = #{rentPerM2},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+</mapper>
