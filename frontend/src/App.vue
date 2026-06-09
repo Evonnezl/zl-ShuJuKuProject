@@ -26,7 +26,7 @@ const allNavItems = [
 
 const navItems = computed(() => {
   if (!user.value) return []
-  if (user.value.role === 'owner') return allNavItems
+  if (user.value.role === 'admin') return allNavItems
   return allNavItems.filter(n => !n.adminOnly)
 })
 
@@ -68,7 +68,7 @@ function logout() {
       </nav>
 
       <div class="sidebar-footer">
-        <span>{{ user.name }}（{{ user.role === 'owner' ? '管理员' : '住户' }}）</span>
+        <span>{{ user.name }}（{{ user.role === 'admin' ? '管理员' : '住户' }}）</span>
         <span class="logout-link" @click="logout">退出登录</span>
       </div>
     </aside>

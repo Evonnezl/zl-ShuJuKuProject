@@ -131,7 +131,7 @@ export default {
 
   computed: {
     filteredList() {
-      if (!this.user || this.user.role === 'owner') return this.list
+      if (!this.user || this.user.role === 'admin') return this.list
       return this.list.filter(r => r.userId === this.user.id)
     }
   },

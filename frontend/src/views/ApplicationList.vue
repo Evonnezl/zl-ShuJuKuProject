@@ -233,7 +233,7 @@ export default {
   computed: {
     // 住户只看自己的申请
     filteredList() {
-      if (!this.user || this.user.role === 'owner') return this.list
+      if (!this.user || this.user.role === 'admin') return this.list
       return this.list.filter(a => a.userId === this.user.id)
     },
 
