@@ -8,7 +8,7 @@
     </div>
 
     <!-- 新增标准表单 -->
-    <div v-if="showAddForm" class="glass-card" v-reveal>
+    <div v-if="showAddForm" class="glass-card">
       <div class="card-title">新增住房标准</div>
       <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;">
         <div class="form-group">
@@ -29,7 +29,7 @@
     </div>
 
     <!-- 住房标准列表 -->
-    <div class="glass-card" v-reveal>
+    <div class="glass-card">
       <div class="table-wrapper">
         <table>
           <thead>
