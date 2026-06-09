@@ -17,4 +17,9 @@ public interface UserMapper {
     void updateUser(User user);
 
     void deleteById(Integer id);
+
+    User findByName(String name);
+
+    @org.apache.ibatis.annotations.Select("SELECT id, name, role, phone, email, password FROM user WHERE email = #{email} LIMIT 1")
+    User findByEmail(String email);
 }

@@ -16,9 +16,16 @@
         WHERE id = #{id}
     </select>
 
+    <select id="findByName" resultType="org.example.housebackend.entity.User">
+        SELECT id, name, role, phone, email, password
+        FROM user
+        WHERE name = #{name}
+        LIMIT 1
+    </select>
+
     <insert id="insertUser">
-        INSERT INTO user(name, role, phone, email)
-        VALUES (#{name}, #{role}, #{phone}, #{email})
+        INSERT INTO user(name, role, phone, email, password)
+        VALUES (#{name}, #{role}, #{phone}, #{email}, #{password})
     </insert>
 
     <update id="updateUser">
@@ -28,6 +35,7 @@
             <if test="role != null">role = #{role},</if>
             <if test="phone != null">phone = #{phone},</if>
             <if test="email != null">email = #{email},</if>
+            <if test="password != null">password = #{password},</if>
         </set>
         WHERE id = #{id}
     </update>
