@@ -5,6 +5,7 @@ import org.example.housebackend.service.HousingRecordService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/records")
@@ -25,6 +26,11 @@ public class HousingRecordController {
     @GetMapping("/{id}")
     public HousingRecord getById(@PathVariable Integer id) {
         return service.getById(id);
+    }
+
+    @GetMapping("/{id}/receipt")
+    public Map<String, Object> getReceipt(@PathVariable Integer id) {
+        return service.getReceipt(id);
     }
 
     @PostMapping
