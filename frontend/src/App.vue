@@ -7,14 +7,16 @@ import UserList from './views/UserList.vue'
 import HousingRecordList from './views/HousingRecordList.vue'
 import HousingStandardList from './views/HousingStandardList.vue'
 import Stats from './views/Stats.vue'
+import Dashboard from './views/Dashboard.vue'
 
 const saved = sessionStorage.getItem('user')
 const user = ref(saved ? JSON.parse(saved) : null)
 provide('user', user)
 
-const page = ref(user.value ? 'application' : null)
+const page = ref(user.value ? 'dashboard' : null)
 
 const allNavItems = [
+  { key: 'dashboard',   label: '首页', adminOnly: false },
   { key: 'application', label: '申请管理', adminOnly: false },
   { key: 'house',       label: '房屋管理', adminOnly: true },
   { key: 'user',        label: '用户管理', adminOnly: true },
@@ -32,8 +34,10 @@ const navItems = computed(() => {
 function onLogin(u) {
   user.value = u
   sessionStorage.setItem('user', JSON.stringify(u))
-  page.value = 'application'
+  page.value = 'dashboard'
 }
+
+function goNav(key) { page.value = key }
 
 function logout() {
   user.value = null; page.value = null
@@ -60,6 +64,7 @@ function logout() {
     </nav>
 
     <div class="page-wrap">
+      <Dashboard v-if="page === 'dashboard'" @nav="goNav" />
       <HouseList v-if="page === 'house'" />
       <ApplicationList v-if="page === 'application'" />
       <UserList v-if="page === 'user'" />
