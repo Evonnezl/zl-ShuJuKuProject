@@ -1,0 +1,3 @@
+# 敏感配置（密码等）
+secret.properties
+backend/HouseBackend/src/main/resources/secret.properties
