@@ -2,3 +2,4 @@
 secret.properties
 backend/HouseBackend/src/main/resources/secret.properties
 *.txt
+curl
