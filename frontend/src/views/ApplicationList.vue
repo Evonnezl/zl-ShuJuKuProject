@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- ========== 新建申请表单 ========== -->
-    <div class="glass-card">
+    <div class="glass-card" v-reveal>
       <div class="card-title">
         新建申请
         <span class="text-muted" style="font-weight:400; font-size:12px; margin-left:8px;">
@@ -136,7 +136,7 @@
     </div>
 
     <!-- ========== 申请列表 ========== -->
-    <div class="glass-card">
+    <div class="glass-card" v-reveal>
       <div class="card-title">
         申请列表
         <span class="text-muted" style="font-weight:400; font-size:12px; margin-left:8px;">

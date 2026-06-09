@@ -317,6 +317,17 @@ select.form-control {
 .mt-1 { margin-top: 8px; } .mt-2 { margin-top: 16px; }
 .flex-between { display: flex; justify-content: space-between; align-items: center; }
 
+/* ----- 滚动揭示动画 ----- */
+.reveal-hidden {
+  opacity: 0;
+  transform: translateY(60px);
+  transition: opacity .6s cubic-bezier(.4,0,.2,1), transform .6s cubic-bezier(.4,0,.2,1);
+}
+.reveal-show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 /* ----- 响应式 ----- */
 @media (max-width: 768px) {
   .top-nav { padding: 0 16px; }

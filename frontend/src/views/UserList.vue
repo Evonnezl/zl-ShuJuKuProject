@@ -8,7 +8,7 @@
     </div>
 
     <!-- 新增用户表单 -->
-    <div v-if="showAddForm" class="glass-card">
+    <div v-if="showAddForm" class="glass-card" v-reveal>
       <div class="card-title">新增用户</div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
         <div class="form-group">
@@ -36,7 +36,7 @@
     </div>
 
     <!-- 用户列表 -->
-    <div class="glass-card">
+    <div class="glass-card" v-reveal>
       <div class="table-wrapper">
         <table>
           <thead>

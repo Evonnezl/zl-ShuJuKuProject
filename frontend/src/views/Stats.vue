@@ -2,19 +2,19 @@
   <div>
     <!-- 统计概览卡片 -->
     <div class="stat-grid">
-      <div class="stat-card">
+      <div class="stat-card" v-reveal>
         <div class="stat-value">{{ stats.emptyHouse ?? '-' }}</div>
         <div class="stat-label">空房数量</div>
       </div>
-      <div class="stat-card">
+      <div class="stat-card" v-reveal>
         <div class="stat-value">{{ stats.allocatedHouse ?? '-' }}</div>
         <div class="stat-label">已分配房屋</div>
       </div>
-      <div class="stat-card">
+      <div class="stat-card" v-reveal>
         <div class="stat-value">{{ stats.applicationCount ?? '-' }}</div>
         <div class="stat-label">申请总数</div>
       </div>
-      <div class="stat-card">
+      <div class="stat-card" v-reveal>
         <div class="stat-value">{{ stats.thresholdScore ?? '-' }}</div>
         <div class="stat-label">最低阈值分数</div>
       </div>
@@ -22,15 +22,15 @@
 
     <!-- 住房汇总 -->
     <div v-if="stats.housingSummary" class="stat-grid" style="grid-template-columns: repeat(3, 1fr);">
-      <div class="stat-card">
+      <div class="stat-card" v-reveal>
         <div class="stat-value">{{ stats.housingSummary.total_houses }}</div>
         <div class="stat-label">总房屋数</div>
       </div>
-      <div class="stat-card">
+      <div class="stat-card" v-reveal>
         <div class="stat-value">{{ stats.housingSummary.total_area }} <span style="font-size:14px;">㎡</span></div>
         <div class="stat-label">总面积</div>
       </div>
-      <div class="stat-card">
+      <div class="stat-card" v-reveal>
         <div class="stat-value">{{ stats.housingSummary.avg_rent_per_m2 }} <span style="font-size:14px;">元</span></div>
         <div class="stat-label">平均租金单价（每㎡）</div>
       </div>
@@ -39,7 +39,7 @@
     <!-- 查询工具 -->
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
       <!-- 按面积查询阈值 -->
-      <div class="glass-card">
+      <div class="glass-card" v-reveal>
         <div class="card-title">按面积查询分房阈值</div>
         <div class="form-group">
           <label>输入面积（㎡）</label>
@@ -55,7 +55,7 @@
       </div>
 
       <!-- 按房号查询租金 -->
-      <div class="glass-card">
+      <div class="glass-card" v-reveal>
         <div class="card-title">按房号查询单位面积租金</div>
         <div class="form-group">
           <label>输入房号</label>
@@ -72,7 +72,7 @@
     </div>
 
     <!-- 房屋租金一览表 -->
-    <div class="glass-card">
+    <div class="glass-card" v-reveal>
       <div class="card-title">房屋租金一览</div>
       <div class="table-wrapper">
         <table>
