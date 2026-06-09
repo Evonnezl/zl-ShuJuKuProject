@@ -1,64 +1,109 @@
 <template>
   <div>
-    <h2>统计查询</h2>
-
-    <!-- 住房汇总 -->
-    <div class="card">
-      <h3>住房汇总</h3>
-      <p>空房数量：{{ stats.emptyHouse }}</p>
-      <p>已分配房屋：{{ stats.allocatedHouse }}</p>
-      <p>申请总数：{{ stats.applicationCount }}</p>
-      <p>最低阈值分数：{{ stats.thresholdScore }}</p>
-      <div v-if="stats.housingSummary">
-        <p>总房屋数：{{ stats.housingSummary.total_houses }}</p>
-        <p>总面积：{{ stats.housingSummary.total_area }} ㎡</p>
-        <p>平均租金单价：{{ stats.housingSummary.avg_rent_per_m2 }} 元/㎡</p>
+    <!-- 统计概览卡片 -->
+    <div class="stat-grid">
+      <div class="stat-card">
+        <div class="stat-value">{{ stats.emptyHouse ?? '-' }}</div>
+        <div class="stat-label">空房数量</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{{ stats.allocatedHouse ?? '-' }}</div>
+        <div class="stat-label">已分配房屋</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{{ stats.applicationCount ?? '-' }}</div>
+        <div class="stat-label">申请总数</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{{ stats.thresholdScore ?? '-' }}</div>
+        <div class="stat-label">最低阈值分数</div>
       </div>
     </div>
 
-    <!-- 按面积查询阈值 -->
-    <div class="card">
-      <h3>按面积查询分房阈值</h3>
-      <input v-model="queryArea" type="number" placeholder="输入面积（㎡）" />
-      <button @click="queryThreshold">查询</button>
-      <p v-if="thresholdResult !== null">
-        面积 {{ thresholdResult.area }}㎡ 的最低分数要求：{{ thresholdResult.minScore }} 分
-      </p>
+    <!-- 住房汇总 -->
+    <div v-if="stats.housingSummary" class="stat-grid" style="grid-template-columns: repeat(3, 1fr);">
+      <div class="stat-card">
+        <div class="stat-value">{{ stats.housingSummary.total_houses }}</div>
+        <div class="stat-label">总房屋数</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{{ stats.housingSummary.total_area }} <span style="font-size:14px;">㎡</span></div>
+        <div class="stat-label">总面积</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{{ stats.housingSummary.avg_rent_per_m2 }} <span style="font-size:14px;">元</span></div>
+        <div class="stat-label">平均租金单价（每㎡）</div>
+      </div>
     </div>
 
-    <!-- 按房号查询租金 -->
-    <div class="card">
-      <h3>按房号查询单位面积租金</h3>
-      <input v-model="queryTitle" placeholder="输入房号（如 A101）" />
-      <button @click="queryRent">查询</button>
-      <p v-if="rentResult !== null">
-        房号 {{ rentResult.title }} 的每平米租金：{{ rentResult.rentPerM2 }} 元
-      </p>
+    <!-- 查询工具 -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+      <!-- 按面积查询阈值 -->
+      <div class="card">
+        <div class="card-header">按面积查询分房阈值</div>
+        <div class="form-group">
+          <label>输入面积（㎡）</label>
+          <div style="display:flex; gap:8px;">
+            <input v-model="queryArea" type="number" class="form-control" placeholder="如：80" style="flex:1;" />
+            <button class="btn btn-primary" @click="queryThreshold">查询</button>
+          </div>
+        </div>
+        <div v-if="thresholdResult !== null" class="alert alert-info mt-1">
+          面积 <strong>{{ thresholdResult.area }}㎡</strong> 的最低分数要求：
+          <strong style="font-size:18px; color:var(--primary);">{{ thresholdResult.minScore }} 分</strong>
+        </div>
+      </div>
+
+      <!-- 按房号查询租金 -->
+      <div class="card">
+        <div class="card-header">按房号查询单位面积租金</div>
+        <div class="form-group">
+          <label>输入房号</label>
+          <div style="display:flex; gap:8px;">
+            <input v-model="queryTitle" class="form-control" placeholder="如：A101" style="flex:1;" />
+            <button class="btn btn-primary" @click="queryRent">查询</button>
+          </div>
+        </div>
+        <div v-if="rentResult !== null" class="alert alert-info mt-1">
+          房号 <strong>{{ rentResult.title }}</strong> 的每平米租金：
+          <strong style="font-size:18px; color:var(--primary);">{{ rentResult.rentPerM2 }} 元</strong>
+        </div>
+      </div>
     </div>
 
-    <!-- 房屋租金列表 -->
+    <!-- 房屋租金一览表 -->
     <div class="card">
-      <h3>房屋租金一览</h3>
-      <table border="1" cellpadding="6" v-if="stats.houseRentInfo && stats.houseRentInfo.length">
-        <thead>
-          <tr>
-            <th>房号</th>
-            <th>面积（㎡）</th>
-            <th>每平米租金（元）</th>
-            <th>月租金（元）</th>
-            <th>状态</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="item in stats.houseRentInfo" :key="item.id">
-            <td>{{ item.title }}</td>
-            <td>{{ item.area }}</td>
-            <td>{{ item.rent_per_m2 }}</td>
-            <td>{{ item.monthly_rent }}</td>
-            <td>{{ item.status }}</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="card-header">房屋租金一览</div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>房号</th>
+              <th>面积（㎡）</th>
+              <th>每平米租金（元）</th>
+              <th>月租金（元）</th>
+              <th>状态</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="item in (stats.houseRentInfo || [])" :key="item.id">
+              <td><strong>{{ item.title }}</strong></td>
+              <td class="col-center">{{ item.area }}</td>
+              <td class="col-right">{{ item.rent_per_m2 }} 元</td>
+              <td class="col-right">{{ item.monthly_rent }} 元</td>
+              <td>
+                <span class="tag" :class="item.status === '空房' ? 'tag-success' : 'tag-warning'">
+                  {{ item.status }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div v-if="!stats.houseRentInfo || stats.houseRentInfo.length === 0" class="empty-state">
+        <div class="empty-icon">-</div>
+        <p>暂无租金数据</p>
+      </div>
     </div>
   </div>
 </template>
@@ -83,9 +128,7 @@ export default {
     load() {
       fetch('http://localhost:8080/stats')
         .then(res => res.json())
-        .then(data => {
-          this.stats = data
-        })
+        .then(data => { this.stats = data })
         .catch(err => console.error('加载统计失败', err))
     },
 
@@ -93,9 +136,7 @@ export default {
       if (!this.queryArea) return
       fetch(`http://localhost:8080/stats/threshold?area=${this.queryArea}`)
         .then(res => res.json())
-        .then(data => {
-          this.thresholdResult = data
-        })
+        .then(data => { this.thresholdResult = data })
         .catch(err => console.error('查询阈值失败', err))
     },
 
@@ -103,44 +144,9 @@ export default {
       if (!this.queryTitle) return
       fetch(`http://localhost:8080/stats/rent?title=${encodeURIComponent(this.queryTitle)}`)
         .then(res => res.json())
-        .then(data => {
-          this.rentResult = data
-        })
+        .then(data => { this.rentResult = data })
         .catch(err => console.error('查询租金失败', err))
     }
   }
 }
 </script>
-
-<style scoped>
-.card {
-  margin-top: 20px;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.card h3 {
-  margin-top: 0;
-}
-
-input {
-  padding: 4px 8px;
-  margin-right: 10px;
-}
-
-button {
-  padding: 6px 12px;
-}
-
-table {
-  border-collapse: collapse;
-  width: 100%;
-  margin-top: 10px;
-}
-
-th, td {
-  padding: 6px;
-  text-align: center;
-}
-</style>
