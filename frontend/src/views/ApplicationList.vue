@@ -1,8 +1,8 @@
 <template>
   <div>
     <!-- ========== 新建申请表单 ========== -->
-    <div class="card">
-      <div class="card-header">
+    <div class="glass-card">
+      <div class="card-title">
         新建申请
         <span class="text-muted" style="font-weight:400; font-size:12px; margin-left:8px;">
           选择申请人、类型并填写信息
@@ -136,8 +136,8 @@
     </div>
 
     <!-- ========== 申请列表 ========== -->
-    <div class="card">
-      <div class="card-header">
+    <div class="glass-card">
+      <div class="card-title">
         申请列表
         <span class="text-muted" style="font-weight:400; font-size:12px; margin-left:8px;">
           共 {{ filteredList.length }} 条

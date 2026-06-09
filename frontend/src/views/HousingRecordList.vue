@@ -5,7 +5,7 @@
       <span class="text-muted">共 {{ filteredList.length }} 条记录</span>
     </div>
 
-    <div class="card">
+    <div class="glass-card">
       <div class="table-wrapper">
         <table>
           <thead>

@@ -10,7 +10,6 @@ import Stats from './views/Stats.vue'
 
 const saved = sessionStorage.getItem('user')
 const user = ref(saved ? JSON.parse(saved) : null)
-
 provide('user', user)
 
 const page = ref(user.value ? 'application' : null)
@@ -30,8 +29,6 @@ const navItems = computed(() => {
   return allNavItems.filter(n => !n.adminOnly)
 })
 
-const currentNav = computed(() => navItems.value.find(n => n.key === page.value))
-
 function onLogin(u) {
   user.value = u
   sessionStorage.setItem('user', JSON.stringify(u))
@@ -39,8 +36,7 @@ function onLogin(u) {
 }
 
 function logout() {
-  user.value = null
-  page.value = null
+  user.value = null; page.value = null
   sessionStorage.removeItem('user')
 }
 </script>
@@ -48,51 +44,27 @@ function logout() {
 <template>
   <Login v-if="!user" @login="onLogin" />
 
-  <div v-else id="app-layout">
-    <aside class="sidebar">
-      <div class="sidebar-header">
-        <div class="logo">房产管理系统</div>
-        <div class="subtitle">HOUSING MANAGEMENT</div>
+  <div v-else>
+    <div class="stars-layer" />
+    <nav class="top-nav">
+      <span class="logo">房产管理系统</span>
+      <div class="nav-links">
+        <span v-for="item in navItems" :key="item.key"
+          class="nav-link" :class="{ active: page === item.key }"
+          @click="page = item.key">{{ item.label }}</span>
       </div>
-
-      <nav class="sidebar-nav">
-        <div
-          v-for="item in navItems"
-          :key="item.key"
-          class="nav-item"
-          :class="{ active: page === item.key }"
-          @click="page = item.key"
-        >
-          <span>{{ item.label }}</span>
-        </div>
-      </nav>
-
-      <div class="sidebar-footer">
-        <span>{{ user.name }}（{{ user.role === 'admin' ? '管理员' : '住户' }}）</span>
-        <span class="logout-link" @click="logout">退出登录</span>
+      <div class="user-info">
+        <span>{{ user.name }}</span>
+        <span class="logout-btn" @click="logout">退出</span>
       </div>
-    </aside>
-
-    <div class="main-area">
-      <header class="page-header">
-        <h1>{{ currentNav?.label }}</h1>
-      </header>
-
-      <main class="page-body">
-        <HouseList v-if="page === 'house'" />
-        <ApplicationList v-if="page === 'application'" />
-        <UserList v-if="page === 'user'" />
-        <HousingRecordList v-if="page === 'record'" />
-        <HousingStandardList v-if="page === 'standard'" />
-        <Stats v-if="page === 'stats'" />
-      </main>
+    </nav>
+    <div class="page-wrap" :key="page">
+      <HouseList v-if="page === 'house'" />
+      <ApplicationList v-if="page === 'application'" />
+      <UserList v-if="page === 'user'" />
+      <HousingRecordList v-if="page === 'record'" />
+      <HousingStandardList v-if="page === 'standard'" />
+      <Stats v-if="page === 'stats'" />
     </div>
   </div>
 </template>
-
-<style scoped>
-#app-layout { display: flex; min-height: 100vh; width: 100%; }
-.logout-link { color: rgba(255,255,255,.4); cursor: pointer; margin-top: 4px; display: block; }
-.logout-link:hover { color: #fff; }
-.sidebar-footer { display: flex; flex-direction: column; color: rgba(255,255,255,.5); font-size: 12px; }
-</style>

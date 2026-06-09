@@ -8,8 +8,8 @@
     </div>
 
     <!-- 新增用户表单 -->
-    <div v-if="showAddForm" class="card">
-      <div class="card-header">新增用户</div>
+    <div v-if="showAddForm" class="glass-card">
+      <div class="card-title">新增用户</div>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
         <div class="form-group">
           <label>姓名</label>
@@ -36,7 +36,7 @@
     </div>
 
     <!-- 用户列表 -->
-    <div class="card">
+    <div class="glass-card">
       <div class="table-wrapper">
         <table>
           <thead>
@@ -73,7 +73,7 @@
     <!-- 编辑弹窗 -->
     <div v-if="editing" class="modal-mask" @click.self="editing=null">
       <div class="modal-card">
-        <div class="card-header">编辑用户 #{{ editing.id }}</div>
+        <div class="card-title">编辑用户 #{{ editing.id }}</div>
         <div class="form-group">
           <label>姓名</label>
           <input v-model="editing.name" class="form-control" />

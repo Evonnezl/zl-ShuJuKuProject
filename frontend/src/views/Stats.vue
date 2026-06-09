@@ -39,8 +39,8 @@
     <!-- 查询工具 -->
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
       <!-- 按面积查询阈值 -->
-      <div class="card">
-        <div class="card-header">按面积查询分房阈值</div>
+      <div class="glass-card">
+        <div class="card-title">按面积查询分房阈值</div>
         <div class="form-group">
           <label>输入面积（㎡）</label>
           <div style="display:flex; gap:8px;">
@@ -55,8 +55,8 @@
       </div>
 
       <!-- 按房号查询租金 -->
-      <div class="card">
-        <div class="card-header">按房号查询单位面积租金</div>
+      <div class="glass-card">
+        <div class="card-title">按房号查询单位面积租金</div>
         <div class="form-group">
           <label>输入房号</label>
           <div style="display:flex; gap:8px;">
@@ -72,8 +72,8 @@
     </div>
 
     <!-- 房屋租金一览表 -->
-    <div class="card">
-      <div class="card-header">房屋租金一览</div>
+    <div class="glass-card">
+      <div class="card-title">房屋租金一览</div>
       <div class="table-wrapper">
         <table>
           <thead>
