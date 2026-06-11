@@ -58,6 +58,9 @@
         </button>
       </template>
 
+      <div v-if="debugCode" class="debug-hint">
+        验证码：<strong>{{ debugCode }}</strong>
+      </div>
     </div>
   </div>
 </template>
@@ -73,7 +76,8 @@ export default {
       success: '',
       sending: false,
       codeSent: false,
-      codeCountdown: 60
+      codeCountdown: 60,
+      debugCode: ''
     }
   },
 
@@ -89,6 +93,7 @@ export default {
       this.mode = m
       this.error = ''
       this.success = ''
+      this.debugCode = ''
     },
 
     doLogin() {
@@ -125,6 +130,7 @@ export default {
         })
         .then(data => {
           this.success = data.message
+          this.debugCode = data.debugCode || ''
           this.codeSent = true
           this.sending = false
           this.codeCountdown = 60
@@ -161,38 +167,66 @@ export default {
 
 <style scoped>
 .login-page {
-  width: 100%; min-height: 100vh;
-  display: flex; align-items: center; justify-content: center;
-  position: relative; z-index: 1;
-}
-.login-page::before {
-  content: ''; position: fixed; inset: 0; z-index: -1;
-  background: linear-gradient(135deg, #0a0418 0%, #0f172a 30%, #0c1929 60%, #0a0418 100%);
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #1e293b 100%);
 }
 .login-card {
-  background: rgba(255,255,255,.78);
-  backdrop-filter: blur(20px) saturate(150%);
-  -webkit-backdrop-filter: blur(20px) saturate(150%);
-  border: 1px solid rgba(255,255,255,.25);
-  border-radius: 20px; padding: 36px 40px;
-  width: 400px; max-width: 90vw;
-  box-shadow: 0 8px 32px rgba(30,10,60,.15);
+  background: #fff;
+  border-radius: 12px;
+  padding: 36px 40px;
+  width: 400px;
+  max-width: 90vw;
+  box-shadow: 0 20px 60px rgba(0,0,0,.3);
 }
-.login-header { text-align: center; margin-bottom: 24px; }
+.login-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
 .login-header h1 {
   font-size: 24px;
-  background: linear-gradient(135deg, #60a5fa, #3b82f6);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  background-clip: text;
-  margin: 0 0 4px; letter-spacing: 2px;
+  color: #1e293b;
+  margin: 0 0 4px;
+  letter-spacing: 2px;
 }
-.login-sub { font-size: 12px; color: #94a3b8; letter-spacing: 2px; }
-.tab-bar { display: flex; margin-bottom: 20px; border-bottom: 2px solid rgba(0,0,0,.06); }
+.login-sub {
+  font-size: 12px;
+  color: #94a3b8;
+  letter-spacing: 2px;
+}
+.tab-bar {
+  display: flex;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #e2e8f0;
+}
 .tab {
-  flex: 1; text-align: center; padding: 10px; cursor: pointer;
-  font-size: 15px; color: #94a3b8; transition: all .2s;
-  border-bottom: 2px solid transparent; margin-bottom: -2px;
+  flex: 1;
+  text-align: center;
+  padding: 10px;
+  cursor: pointer;
+  font-size: 15px;
+  color: #94a3b8;
+  transition: all 0.2s;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
 }
-.tab.active { color: #3b82f6; font-weight: 600; border-bottom-color: #3b82f6; }
-.tab:hover { color: #3b82f6; }
+.tab.active {
+  color: #4f6ef7;
+  font-weight: 600;
+  border-bottom-color: #4f6ef7;
+}
+.tab:hover { color: #4f6ef7; }
+.debug-hint {
+  margin-top: 14px;
+  padding: 8px 12px;
+  background: #fefce8;
+  border: 1px dashed #eab308;
+  border-radius: 6px;
+  font-size: 13px;
+  text-align: center;
+  color: #854d0e;
+}
 </style>

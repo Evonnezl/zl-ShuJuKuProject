@@ -27,9 +27,19 @@ public class HouseController {
         return houseService.getById(id);
     }
 
+    @PostMapping
+    public void insert(@RequestBody House house) {
+        houseService.insert(house);
+    }
+
     @PutMapping("/{id}")
     public void update(@PathVariable Integer id, @RequestBody House house) {
         house.setId(id);
         houseService.update(house);
+    }
+
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Integer id) {
+        houseService.deleteById(id);
     }
 }

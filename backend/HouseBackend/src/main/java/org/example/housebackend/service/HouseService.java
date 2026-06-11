@@ -26,4 +26,12 @@ public class HouseService {
     public void update(House house) {
         houseMapper.updateHouse(house);
     }
+
+    public void insert(House house) {
+        houseMapper.insertHouse(house);
+    }
+
+    public void deleteById(Integer id) {
+        houseMapper.deleteById(id);
+    }
 }

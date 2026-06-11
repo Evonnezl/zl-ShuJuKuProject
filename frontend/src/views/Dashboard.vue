@@ -9,15 +9,15 @@
         <div class="stat-label">房屋总数</div>
       </div>
       <div class="stat-card">
-        <div class="stat-value" style="color:#2ed573;">{{ stats.emptyHouse ?? '-' }}</div>
+        <div class="stat-value">{{ stats.emptyHouse ?? '-' }}</div>
         <div class="stat-label">空房数量</div>
       </div>
       <div class="stat-card">
-        <div class="stat-value" style="color:#ffa502;">{{ stats.allocatedHouse ?? '-' }}</div>
+        <div class="stat-value">{{ stats.allocatedHouse ?? '-' }}</div>
         <div class="stat-label">已分配</div>
       </div>
       <div class="stat-card">
-        <div class="stat-value" style="color:#ff4757;">{{ pendingCount }}</div>
+        <div class="stat-value">{{ pendingCount }}</div>
         <div class="stat-label">待审批申请</div>
       </div>
     </div>
