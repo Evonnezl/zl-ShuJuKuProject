@@ -35,40 +35,52 @@
       <span v-if="msg" class="alert alert-success" style="margin-left:12px;">{{ msg }}</span>
     </div>
 
-    <!-- 房屋列表 -->
-    <div class="glass-card">
-      <div class="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th style="width:60px;">ID</th>
-              <th>房屋名称</th>
-              <th style="width:100px;">状态</th>
-              <th style="width:100px;">面积（㎡）</th>
-              <th style="width:130px;">每平米租金</th>
-              <th style="width:120px;">月租金</th>
-              <th style="width:120px;">操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="item in list" :key="item.id">
-              <td>{{ item.id }}</td>
-              <td><strong>{{ item.title }}</strong></td>
-              <td>
-                <span class="tag" :class="(item.status === '空房' || item.status === 'empty') ? 'tag-success' : 'tag-warning'">
-                  {{ item.status === 'empty' ? '空房' : item.status }}
-                </span>
-              </td>
-              <td class="col-center">{{ item.area }}</td>
-              <td class="col-right">{{ item.rentPerM2 }} 元</td>
-              <td class="col-right">{{ (item.area * item.rentPerM2).toFixed(2) }} 元</td>
-              <td>
-                <button class="btn btn-outline btn-sm" @click="startEdit(item)">编辑</button>
-                <button class="btn btn-danger btn-sm" style="margin-left:6px;" @click="del(item.id)">删除</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+    <!-- 房屋卡片网格 -->
+    <div class="house-grid">
+      <div
+        v-for="item in list"
+        :key="item.id"
+        class="house-card"
+        :class="buildingClass(item.title)"
+      >
+        <!-- 顶部色条 -->
+        <div class="card-top-bar" :style="{ background: buildingGradient(item.title) }"></div>
+
+        <!-- 卡片内容 -->
+        <div class="card-body">
+          <div class="card-title-row">
+            <span class="house-title">{{ item.title }}</span>
+            <span class="tag" :class="(item.status === '空房' || item.status === 'empty') ? 'tag-success' : 'tag-warning'">
+              {{ item.status === 'empty' ? '空房' : item.status }}
+            </span>
+          </div>
+
+          <div class="card-stats">
+            <div class="card-stat">
+              <div>
+                <div class="stat-label">面积</div>
+                <div class="stat-num">{{ item.area }} <small>㎡</small></div>
+              </div>
+            </div>
+            <div class="card-stat">
+              <div>
+                <div class="stat-label">每平米租金</div>
+                <div class="stat-num">{{ item.rentPerM2 }} <small>元</small></div>
+              </div>
+            </div>
+            <div class="card-stat">
+              <div>
+                <div class="stat-label">月租金</div>
+                <div class="stat-num highlight">{{ (item.area * item.rentPerM2).toFixed(0) }} <small>元</small></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-actions">
+            <button class="btn btn-outline btn-sm" @click="startEdit(item)">编辑</button>
+            <button class="btn btn-danger btn-sm" @click="del(item.id)">删除</button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -128,6 +140,23 @@ export default {
         .catch(err => console.error('加载房屋列表失败', err))
     },
 
+    buildingClass(title) {
+      const prefix = (title || '').charAt(0).toUpperCase()
+      return 'bld-' + prefix
+    },
+
+    buildingGradient(title) {
+      const prefix = (title || '').charAt(0).toUpperCase()
+      const colors = {
+        A: 'linear-gradient(135deg, #60a5fa, #3b82f6)',
+        B: 'linear-gradient(135deg, #34d399, #059669)',
+        C: 'linear-gradient(135deg, #fbbf24, #d97706)',
+        D: 'linear-gradient(135deg, #f472b6, #db2777)',
+        E: 'linear-gradient(135deg, #a78bfa, #7c3aed)'
+      }
+      return colors[prefix] || 'linear-gradient(135deg, #94a3b8, #64748b)'
+    },
+
     addHouse() {
       fetch('http://localhost:8080/houses', {
         method: 'POST',
@@ -171,6 +200,90 @@ export default {
 </script>
 
 <style scoped>
+/* 卡片网格 */
+.house-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+/* 房屋卡片 */
+.house-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--glass-shadow);
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+
+/* 顶部色条 */
+.card-top-bar {
+  height: 6px;
+}
+
+/* 卡片内容 */
+.card-body {
+  padding: 16px 18px 18px;
+}
+
+.card-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.house-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #000;
+  letter-spacing: 1px;
+}
+
+/* 统计数据 */
+.card-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.card-stat {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: #000;
+  line-height: 1.2;
+}
+
+.stat-num {
+  font-size: 15px;
+  font-weight: 600;
+  color: #000;
+}
+.stat-num small {
+  font-size: 11px;
+  font-weight: 400;
+}
+.stat-num.highlight {
+  font-size: 18px;
+  color: #000;
+}
+
+/* 操作按钮 */
+.card-actions {
+  display: flex;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0,0,0,.06);
+}
+
+/* 弹窗 */
 .modal-mask {
   position: fixed; inset: 0;
   background: rgba(0,0,0,.35);
@@ -183,6 +296,17 @@ export default {
   padding: 24px;
   width: 440px;
   max-width: 90vw;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 20px 60px rgba(0,0,0,.3);
+}
+
+/* 响应式 */
+@media (max-width: 1100px) {
+  .house-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 800px) {
+  .house-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 500px) {
+  .house-grid { grid-template-columns: 1fr; }
 }
 </style>
