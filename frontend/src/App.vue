@@ -69,13 +69,17 @@ function logout() {
     </nav>
 
     <div class="page-wrap">
-      <Dashboard v-if="page === 'dashboard'" @nav="goNav" />
-      <HouseList v-if="page === 'house'" />
-      <ApplicationList v-if="page === 'application'" />
-      <UserList v-if="page === 'user'" />
-      <HousingRecordList v-if="page === 'record'" />
-      <HousingStandardList v-if="page === 'standard'" />
-      <Stats v-if="page === 'stats'" />
+      <Transition name="page" mode="out-in">
+        <div :key="page">
+          <Dashboard v-if="page === 'dashboard'" @nav="goNav" />
+          <HouseList v-if="page === 'house'" />
+          <ApplicationList v-if="page === 'application'" />
+          <UserList v-if="page === 'user'" />
+          <HousingRecordList v-if="page === 'record'" />
+          <HousingStandardList v-if="page === 'standard'" />
+          <Stats v-if="page === 'stats'" />
+        </div>
+      </Transition>
     </div>
   </div>
 </template>

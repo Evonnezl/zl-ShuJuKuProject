@@ -3,19 +3,19 @@
     <!-- 统计概览卡片 -->
     <div class="stat-grid">
       <div class="stat-card">
-        <div class="stat-value">{{ stats.emptyHouse ?? '-' }}</div>
+        <div class="stat-value"><CountUp :to="stats.emptyHouse ?? 0" /></div>
         <div class="stat-label">空房数量</div>
       </div>
       <div class="stat-card">
-        <div class="stat-value">{{ stats.allocatedHouse ?? '-' }}</div>
+        <div class="stat-value"><CountUp :to="stats.allocatedHouse ?? 0" /></div>
         <div class="stat-label">已分配房屋</div>
       </div>
       <div class="stat-card">
-        <div class="stat-value">{{ stats.applicationCount ?? '-' }}</div>
+        <div class="stat-value"><CountUp :to="stats.applicationCount ?? 0" /></div>
         <div class="stat-label">申请总数</div>
       </div>
       <div class="stat-card">
-        <div class="stat-value">{{ stats.thresholdScore ?? '-' }}</div>
+        <div class="stat-value"><CountUp :to="stats.thresholdScore ?? 0" /></div>
         <div class="stat-label">最低阈值分数</div>
       </div>
     </div>
@@ -23,15 +23,15 @@
     <!-- 住房汇总 -->
     <div v-if="stats.housingSummary" class="stat-grid" style="grid-template-columns: repeat(3, 1fr);">
       <div class="stat-card">
-        <div class="stat-value">{{ stats.housingSummary.total_houses }}</div>
+        <div class="stat-value"><CountUp :to="stats.housingSummary.total_houses ?? 0" /></div>
         <div class="stat-label">总房屋数</div>
       </div>
       <div class="stat-card">
-        <div class="stat-value">{{ stats.housingSummary.total_area }} <span style="font-size:14px;">㎡</span></div>
+        <div class="stat-value"><CountUp :to="stats.housingSummary.total_area ?? 0" /><span style="font-size:14px;"> ㎡</span></div>
         <div class="stat-label">总面积</div>
       </div>
       <div class="stat-card">
-        <div class="stat-value">{{ stats.housingSummary.avg_rent_per_m2 }} <span style="font-size:14px;">元</span></div>
+        <div class="stat-value"><CountUp :to="stats.housingSummary.avg_rent_per_m2 ?? 0" :decimals="2" /><span style="font-size:14px;"> 元</span></div>
         <div class="stat-label">平均租金单价（每㎡）</div>
       </div>
     </div>
@@ -128,8 +128,10 @@
 
 <script>
 import * as echarts from 'echarts'
+import CountUp from '../components/CountUp.vue'
 
 export default {
+  components: { CountUp },
   data() {
     return {
       stats: {},
