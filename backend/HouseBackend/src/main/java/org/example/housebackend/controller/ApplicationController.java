@@ -37,10 +37,10 @@ public class ApplicationController {
         }
     }
 
-    // 分房
+    // 加入分房队列
     @PutMapping("/{id}/approve")
     public Map<String, Object> approve(@PathVariable Integer id) {
-        return applicationService.approve(id);
+        return applicationService.queueForAllocation(id);
     }
 
     // 调房
@@ -53,5 +53,11 @@ public class ApplicationController {
     @PutMapping("/{id}/release")
     public Map<String, Object> release(@PathVariable Integer id) {
         return applicationService.release(id);
+    }
+
+    // 批量分房（月末统一处理）
+    @PostMapping("/batch-allocate")
+    public Map<String, Object> batchAllocate() {
+        return applicationService.batchAllocate();
     }
 }

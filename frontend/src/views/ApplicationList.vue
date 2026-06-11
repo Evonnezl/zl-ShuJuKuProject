@@ -75,6 +75,28 @@
             <label>住房分数 <span class="text-muted">（留空自动计算）</span></label>
             <input v-model.number="form.score" type="number" class="form-control" placeholder="留空则系统自动计算" />
           </div>
+
+          <!-- 实时评分预览 -->
+          <div v-if="previewScore > 0" class="score-preview">
+            <div class="score-total">
+              <span class="score-big">{{ previewScore }}</span>
+              <span class="score-unit">分</span>
+            </div>
+            <div class="score-breakdown">
+              <div class="score-row">
+                <span>部门（{{ form.department }}）</span>
+                <span class="score-pts">{{ deptScore }} 分</span>
+              </div>
+              <div class="score-row">
+                <span>职称（{{ form.titleLevel }}）</span>
+                <span class="score-pts">{{ titleScore }} 分</span>
+              </div>
+              <div class="score-row">
+                <span>家庭人数（{{ form.familySize }}人 × 5分）</span>
+                <span class="score-pts">{{ familyScore }} 分</span>
+              </div>
+            </div>
+          </div>
           <div class="form-group">
             <label>申请面积（㎡）</label>
             <input v-model.number="form.requestArea" type="number" min="10" class="form-control" placeholder="如：80" />
@@ -137,11 +159,18 @@
 
     <!-- ========== 申请列表 ========== -->
     <div class="glass-card">
-      <div class="card-title">
-        申请列表
-        <span class="text-muted" style="font-weight:400; font-size:12px; margin-left:8px;">
-          共 {{ filteredList.length }} 条
+      <div class="card-title" style="display:flex; align-items:center; justify-content:space-between;">
+        <span>
+          申请列表
+          <span class="text-muted" style="font-weight:400; font-size:12px; margin-left:8px;">
+            共 {{ filteredList.length }} 条
+            <span v-if="queueCount > 0" style="color:#0d9488; font-weight:600;">｜队列 {{ queueCount }} 人</span>
+          </span>
         </span>
+        <button v-if="user.role === 'admin' && queueCount > 0"
+          class="btn btn-success btn-sm" @click="batchAllocate">
+          月末批量分房（{{ queueCount }}人）
+        </button>
       </div>
       <div class="table-wrapper">
         <table>
@@ -171,6 +200,7 @@
               </td>
               <td>
                 <span v-if="item.status === 'PENDING'" class="tag tag-warning">待审批</span>
+                <span v-else-if="item.status === 'QUEUED'" class="tag tag-info">队列中</span>
                 <span v-else-if="item.status === 'APPROVED'" class="tag tag-success">已通过</span>
                 <span v-else-if="item.status === 'REJECTED'" class="tag tag-danger">已拒绝</span>
                 <span v-else>{{ item.status }}</span>
@@ -183,8 +213,8 @@
               <td>
                 <button
                   v-if="item.type === 'ALLOCATE' && item.status === 'PENDING'"
-                  class="btn btn-success btn-sm" @click="approve(item)">
-                  分房
+                  class="btn btn-info btn-sm" @click="approve(item)">
+                  加入队列
                 </button>
                 <button
                   v-if="item.type === 'TRANSFER' && item.status === 'PENDING'"
@@ -261,6 +291,29 @@ export default {
         .filter(r => r.userId === this.form.userId)
         .map(r => r.houseId)
       return this.allocatedHouses.filter(h => userRecordIds.includes(h.id))
+    },
+    deptScore() {
+      const map = {
+        '计算机学院': 30, '电子信息学院': 30,
+        '数学与统计学院': 25, '物理学院': 25, '化学学院': 25, '生命科学学院': 25,
+        '经济管理学院': 20, '法学院': 20, '外国语学院': 20, '马克思主义学院': 20,
+        '后勤集团': 15, '图书馆': 15, '校机关': 15
+      }
+      return map[this.form.department] || 0
+    },
+    titleScore() {
+      const map = { '教授': 50, '副教授': 40, '讲师': 30, '助教': 20, '其他': 10 }
+      return map[this.form.titleLevel] || 0
+    },
+    familyScore() {
+      return (this.form.familySize || 0) * 5
+    },
+    previewScore() {
+      if (!this.form.department || !this.form.titleLevel || !this.form.familySize) return 0
+      return this.deptScore + this.titleScore + this.familyScore
+    },
+    queueCount() {
+      return this.list.filter(a => a.status === 'QUEUED').length
     },
     canSubmit() {
       const f = this.form
@@ -380,6 +433,18 @@ export default {
         })
         .catch(err => console.error(err))
     },
+    batchAllocate() {
+      if (!confirm('确认进行月末批量分房？将按分数从高到低依次处理队列中的所有申请。')) return
+      fetch('http://localhost:8080/applications/batch-allocate', { method: 'POST' })
+        .then(res => res.json())
+        .then(data => {
+          this.loadApps(); this.loadHouses(); this.loadRecords()
+          const detail = data.detail ? '\n\n' + data.detail : ''
+          this.msg = data.success ? '[OK] ' + data.message + detail : '[提示] ' + data.message
+          setTimeout(() => { this.msg = '' }, 10000)
+        })
+        .catch(err => console.error(err))
+    },
     transfer(item) {
       fetch(`http://localhost:8080/applications/${item.id}/transfer`, { method: 'PUT' })
         .then(res => res.json())
@@ -403,3 +468,49 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+/* 实时评分预览 */
+.score-preview {
+  margin-top: 12px;
+  padding: 16px 20px;
+  background: rgba(59,130,246,.06);
+  border: 1px solid rgba(59,130,246,.12);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+.score-total {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+.score-big {
+  font-size: 40px;
+  font-weight: 700;
+  color: #3b82f6;
+  line-height: 1;
+}
+.score-unit {
+  font-size: 14px;
+  color: #3b82f6;
+  opacity: .6;
+}
+.score-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+.score-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #000;
+}
+.score-pts {
+  font-weight: 600;
+  opacity: .5;
+}
+</style>

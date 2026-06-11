@@ -22,4 +22,7 @@ public interface UserMapper {
 
     @org.apache.ibatis.annotations.Select("SELECT id, name, role, phone, email, password FROM user WHERE email = #{email} LIMIT 1")
     User findByEmail(String email);
+
+    @org.apache.ibatis.annotations.Select("SELECT id, name, role, phone, email, password FROM user WHERE id = #{id} LIMIT 1")
+    User getFullById(Integer id);
 }

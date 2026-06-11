@@ -84,20 +84,10 @@ public class ApplicationService {
     // ==================== 分房（核心） ====================
 
     /**
-     * 分房流程（对应题目要求）：
-     * 1. 校验申请合法性
-     * 2. 根据部门+职称+家庭人数计算分数
-     * 3. 分数 ≥ 对应面积阈值 → 查找空房
-     * 4. 好房优先分配（面积大的优先）
-     * 5. 创建住房记录（含冗余快照字段）
-     * 6. 更新房屋状态为"已分配"
-     * 7. 计算房租写入 rent 表
-     * 8. 更新申请状态为 APPROVED
+     * 加入分房队列（不再立即分房，符合题目要求的"插入队列"机制）
      */
-    public Map<String, Object> approve(Integer id) {
+    public Map<String, Object> queueForAllocation(Integer id) {
         Map<String, Object> result = new HashMap<>();
-
-        // 1. 获取申请
         Application app = applicationMapper.getById(id);
         if (app == null || !"PENDING".equals(app.getStatus())) {
             result.put("success", false);
@@ -105,39 +95,98 @@ public class ApplicationService {
             return result;
         }
 
-        // 2. 计算分数（题目：根据申请者情况计算其分数）
+        // 计算分数并插入队列
         int calculatedScore = calculateScore(app);
         app.setScore(calculatedScore);
+        app.setStatus("QUEUED");
+        applicationMapper.update(app);
 
-        // 3. 阈值校验：查找对应面积的住房标准
+        // 查看队列排名
+        List<Application> queue = getQueueSorted();
+        int position = 0;
+        for (int i = 0; i < queue.size(); i++) {
+            if (queue.get(i).getId().equals(id)) { position = i + 1; break; }
+        }
+
+        result.put("success", true);
+        result.put("message", "已加入分房队列（得分" + calculatedScore + "，队列排名第" + position + "位，共" + queue.size() + "人排队）");
+        return result;
+    }
+
+    /**
+     * 批量分房（题目要求：月末统一处理）
+     * 按分数从高到低依次处理队列中的所有申请
+     */
+    public Map<String, Object> batchAllocate() {
+        Map<String, Object> result = new HashMap<>();
+        List<Application> queue = getQueueSorted();
+        if (queue.isEmpty()) {
+            result.put("success", false);
+            result.put("message", "分房队列为空");
+            return result;
+        }
+
+        int allocated = 0;
+        int rejected = 0;
+        int waiting = 0;
+        StringBuilder detail = new StringBuilder();
+
+        for (Application app : queue) {
+            Map<String, Object> single = doAllocate(app);
+            if (Boolean.TRUE.equals(single.get("success"))) {
+                allocated++;
+                detail.append("✅ ").append(single.get("message")).append("\n");
+            } else if (single.containsKey("rejected") && Boolean.TRUE.equals(single.get("rejected"))) {
+                rejected++;
+                detail.append("❌ ").append(single.get("message")).append("\n");
+            } else {
+                waiting++;
+                detail.append("⏳ ").append(single.get("message")).append("\n");
+            }
+        }
+
+        result.put("success", true);
+        result.put("message", "分房完成：成功" + allocated + "人，拒绝" + rejected + "人，等待" + waiting + "人");
+        result.put("detail", detail.toString().trim());
+        result.put("allocated", allocated);
+        result.put("rejected", rejected);
+        result.put("waiting", waiting);
+        return result;
+    }
+
+    /**
+     * 单条分房逻辑（从队列中取出的申请进行实际分配）
+     */
+    private Map<String, Object> doAllocate(Application app) {
+        Map<String, Object> result = new HashMap<>();
+        int calculatedScore = app.getScore() != null ? app.getScore() : calculateScore(app);
+
         HousingStandard matchedStandard = findStandard(app.getRequestArea());
         if (matchedStandard == null) {
             app.setStatus("REJECTED");
             applicationMapper.update(app);
             result.put("success", false);
-            result.put("message", "未找到匹配的住房标准，申请已拒绝");
+            result.put("rejected", true);
+            result.put("message", app.getUserId() + " 未找到匹配住房标准，已拒绝");
             return result;
         }
         if (calculatedScore < matchedStandard.getMinScore()) {
             app.setStatus("REJECTED");
             applicationMapper.update(app);
             result.put("success", false);
-            result.put("message", "分数不足（得分" + calculatedScore + "，需要" + matchedStandard.getMinScore() + "），申请已拒绝");
+            result.put("rejected", true);
+            result.put("message", app.getUserId() + " 分数不足（" + calculatedScore + "＜" + matchedStandard.getMinScore() + "），已拒绝");
             return result;
         }
 
-        // 4. 在同等级空房中查找，好房优先（按面积从大到小排列）
         List<House> gradeHouses = findHousesInGrade(matchedStandard);
         if (gradeHouses.isEmpty()) {
             result.put("success", false);
-            result.put("message", "该等级（" + matchedStandard.getMinArea() + "~" + matchedStandard.getMaxArea() + "㎡）暂无空房，申请保持待审批状态");
+            result.put("message", app.getUserId() + " 该等级暂无空房，留在队列等待");
             return result;
         }
 
-        // 分配该等级内最优空房（面积最大的）
         House bestHouse = gradeHouses.get(0);
-
-        // 5. 创建住房记录（题目要求：户主、部门、职称、家庭人口、住房分数、房号、住房面积）
         User user = userMapper.getById(app.getUserId());
 
         HousingRecord record = new HousingRecord();
@@ -145,8 +194,6 @@ public class ApplicationService {
         record.setHouseId(bestHouse.getId());
         record.setScore(calculatedScore);
         record.setMoveInDate(LocalDate.now());
-
-        // 冗余快照字段（题目要求的住房表内容）
         record.setUserName(user != null ? user.getName() : "");
         record.setDepartment(app.getDepartment());
         record.setTitleLevel(app.getTitleLevel());
@@ -154,17 +201,13 @@ public class ApplicationService {
         record.setHouseTitle(bestHouse.getTitle());
         record.setHouseArea(bestHouse.getArea());
 
-        // 6. 计算房租 = 面积 × 每平米月租金
         double rentAmount = bestHouse.getArea() * bestHouse.getRentPerM2();
         record.setRentAmount(rentAmount);
-
         housingRecordMapper.insert(record);
 
-        // 7. 更新房屋状态
         bestHouse.setStatus("已分配");
         houseMapper.updateHouse(bestHouse);
 
-        // 8. 写入房租表（题目要求：计算房租并将算出的房租写到房租文件中）
         Rent rent = new Rent();
         rent.setUserId(app.getUserId());
         rent.setHouseId(bestHouse.getId());
@@ -172,15 +215,24 @@ public class ApplicationService {
         rent.setRentDate(LocalDate.now());
         rentMapper.insert(rent);
 
-        // 9. 更新申请状态
         app.setHouseId(bestHouse.getId());
         app.setStatus("APPROVED");
         applicationMapper.update(app);
 
         result.put("success", true);
-        result.put("message", "分房成功！分配 " + bestHouse.getTitle()
-                + "（" + bestHouse.getArea() + "㎡），月租金 " + String.format("%.2f", rentAmount) + " 元");
+        result.put("message", (user != null ? user.getName() : app.getUserId()) + " → " + bestHouse.getTitle()
+                + "（" + bestHouse.getArea() + "㎡，" + String.format("%.0f", rentAmount) + "元/月）");
         return result;
+    }
+
+    /**
+     * 获取队列中所有申请，按分数从高到低排序
+     */
+    private List<Application> getQueueSorted() {
+        return applicationMapper.getAll().stream()
+                .filter(a -> "QUEUED".equals(a.getStatus()))
+                .sorted(Comparator.comparingInt(Application::getScore).reversed())
+                .toList();
     }
 
     // ==================== 调房 ====================
@@ -330,7 +382,7 @@ public class ApplicationService {
         final double hi = standard.getMaxArea();
 
         return houseMapper.getAll().stream()
-                .filter(h -> "空房".equals(h.getStatus()))
+                .filter(h -> "空房".equals(h.getStatus()) || "empty".equals(h.getStatus()))
                 .filter(h -> h.getArea() > lo && h.getArea() <= hi)
                 .sorted(Comparator.comparingDouble(House::getArea).reversed())
                 .toList();

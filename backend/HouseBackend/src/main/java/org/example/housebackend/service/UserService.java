@@ -75,4 +75,18 @@ public class UserService {
         }
         return null;
     }
+
+    /**
+     * 获取完整用户信息（含密码）
+     */
+    public User getFullById(Integer id) {
+        return userMapper.getFullById(id);
+    }
+
+    /**
+     * 验证密码
+     */
+    public boolean verifyPassword(String rawPassword, String encodedPassword) {
+        return passwordEncoder.matches(rawPassword, encodedPassword);
+    }
 }

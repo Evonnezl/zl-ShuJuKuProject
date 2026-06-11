@@ -141,6 +141,12 @@ body::before {
   display: flex; align-items: center; gap: 12px;
   color: rgba(255,255,255,.55); font-size: 12px;
 }
+.top-nav .user-name-link {
+  cursor: pointer; transition: color .2s;
+}
+.top-nav .user-name-link:hover {
+  color: #fff;
+}
 .top-nav .logout-btn {
   color: rgba(255,255,255,.4); cursor: pointer;
   font-size: 12px; transition: color .2s;

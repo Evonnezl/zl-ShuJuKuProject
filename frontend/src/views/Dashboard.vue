@@ -22,6 +22,18 @@
       </div>
     </div>
 
+    <!-- 迷你趋势图 -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px;">
+      <div class="glass-card" style="padding:16px;">
+        <div class="card-title">各栋房屋数量</div>
+        <div ref="buildingChart" style="width:100%; height:120px;"></div>
+      </div>
+      <div class="glass-card" style="padding:16px;">
+        <div class="card-title">各栋平均面积</div>
+        <div ref="areaChart" style="width:100%; height:120px;"></div>
+      </div>
+    </div>
+
     <!-- 入住率圆环 + 住房总览 -->
     <div style="display:grid; grid-template-columns:280px 1fr; gap:16px; margin-bottom:20px;">
       <!-- 入住率圆环 -->
@@ -119,13 +131,14 @@
 </template>
 
 <script>
+import * as echarts from 'echarts'
 import CountUp from '../components/CountUp.vue'
 
 export default {
   components: { CountUp },
   inject: ['user'],
   data() {
-    return { stats: {}, summary: null, pendingCount: 0, recentRecords: [], userCount: 0 }
+    return { stats: {}, summary: null, pendingCount: 0, recentRecords: [], userCount: 0, houses: [] }
   },
   computed: {
     userName() { return this.user?.name || '' },
@@ -145,6 +158,7 @@ export default {
     this.loadPending()
     this.loadRecords()
     this.loadUsers()
+    this.loadHouses()
   },
   methods: {
     loadStats() {
@@ -172,6 +186,66 @@ export default {
         .then(r => r.json())
         .then(d => { this.userCount = d.length })
         .catch(() => {})
+    },
+    loadHouses() {
+      fetch('http://localhost:8080/houses')
+        .then(r => r.json())
+        .then(d => {
+          this.houses = d
+          this.$nextTick(() => {
+            this.renderBuildingChart()
+            this.renderAreaChart()
+          })
+        })
+        .catch(() => {})
+    },
+    renderBuildingChart() {
+      const el = this.$refs.buildingChart
+      if (!el) return
+      const buildings = ['A', 'B', 'C', 'D', 'E']
+      const counts = buildings.map(b => this.houses.filter(h => (h.title||'').charAt(0).toUpperCase() === b).length)
+      const chart = echarts.init(el)
+      chart.setOption({
+        grid: { top: 18, right: 8, bottom: 20, left: 28 },
+        xAxis: { type: 'category', data: buildings.map(b => b+'栋'), axisLabel: { color: '#000', fontSize: 10 } },
+        yAxis: { type: 'value', axisLabel: { color: '#000', fontSize: 10 }, splitLine: { lineStyle: { color: 'rgba(0,0,0,.04)' } } },
+        series: [{
+          type: 'bar', data: counts, barWidth: 22,
+          itemStyle: {
+            borderRadius: [4, 4, 0, 0],
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              { offset: 0, color: '#60a5fa' }, { offset: 1, color: '#3b82f6' }
+            ])
+          },
+          label: { show: true, position: 'top', color: '#000', fontSize: 11, fontWeight: 'bold', distance: 4 }
+        }]
+      })
+    },
+    renderAreaChart() {
+      const el = this.$refs.areaChart
+      if (!el) return
+      const buildings = ['A', 'B', 'C', 'D', 'E']
+      const avgs = buildings.map(b => {
+        const list = this.houses.filter(h => (h.title||'').charAt(0).toUpperCase() === b)
+        if (!list.length) return 0
+        return +(list.reduce((s, h) => s + h.area, 0) / list.length).toFixed(1)
+      })
+      const chart = echarts.init(el)
+      chart.setOption({
+        grid: { top: 18, right: 8, bottom: 20, left: 38 },
+        xAxis: { type: 'category', data: buildings.map(b => b+'栋'), axisLabel: { color: '#000', fontSize: 10 } },
+        yAxis: { type: 'value', axisLabel: { color: '#000', fontSize: 10, formatter: '{value}㎡' }, splitLine: { lineStyle: { color: 'rgba(0,0,0,.04)' } } },
+        series: [{
+          type: 'bar', data: avgs, barWidth: 22,
+          itemStyle: {
+            borderRadius: [4, 4, 0, 0],
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              { offset: 0, color: '#a78bfa' }, { offset: 1, color: '#7c3aed' }
+            ])
+          },
+          label: { show: true, position: 'top', color: '#000', fontSize: 11, fontWeight: 'bold', formatter: '{c}㎡' }
+        }]
+      })
     }
   }
 }

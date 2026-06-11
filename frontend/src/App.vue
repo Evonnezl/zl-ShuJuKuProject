@@ -7,6 +7,7 @@ import UserList from './views/UserList.vue'
 import HousingRecordList from './views/HousingRecordList.vue'
 import HousingStandardList from './views/HousingStandardList.vue'
 import Stats from './views/Stats.vue'
+import Profile from './views/Profile.vue'
 import Dashboard from './views/Dashboard.vue'
 
 const saved = sessionStorage.getItem('user')
@@ -63,7 +64,7 @@ function logout() {
           @click="page = item.key">{{ item.label }}</span>
       </div>
       <div class="user-info">
-        <span>{{ user.name }}</span>
+        <span class="user-name-link" @click="page = 'profile'">{{ user.name }}</span>
         <span class="logout-btn" @click="logout">退出</span>
       </div>
     </nav>
@@ -78,6 +79,7 @@ function logout() {
           <HousingRecordList v-if="page === 'record'" />
           <HousingStandardList v-if="page === 'standard'" />
           <Stats v-if="page === 'stats'" />
+          <Profile v-if="page === 'profile'" />
         </div>
       </Transition>
     </div>
