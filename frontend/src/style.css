@@ -14,16 +14,16 @@
   --danger: #f87171;
   --danger-light: rgba(248, 113, 113, .12);
 
-  --glass-bg: rgba(240,244,252,.55);
+  --glass-bg: rgba(240,244,252,.40);
   --glass-border: rgba(255,255,255,.25);
   --glass-shadow: 0 8px 32px rgba(15, 20, 45, .14);
 
   --nav-bg: rgba(12, 18, 36, .82);
   --nav-text: rgba(255,255,255,.78);
 
-  --text: #1a1f2e;
-  --text-secondary: #6b5d7d;
-  --text-muted: #9b8dab;
+  --text: #000;
+  --text-secondary: #000;
+  --text-muted: #000;
 
   --radius: 16px;
   --radius-sm: 10px;
@@ -175,6 +175,7 @@ body::before {
   margin-bottom: 20px;
   box-shadow: var(--glass-shadow);
   transition: transform .25s ease, box-shadow .25s ease;
+  text-shadow: 0 0 1px rgba(255,255,255,.6);
 }
 .glass-card:hover {
   transform: translateY(-2px);
@@ -278,10 +279,11 @@ select.form-control {
   padding: 3px 10px; border-radius: 20px;
   font-size: 11px; font-weight: 600; letter-spacing: .2px;
 }
-.tag-primary { background: var(--primary-light); color: var(--primary); }
-.tag-success { background: var(--success-light); color: #0284c7; }
-.tag-warning { background: var(--warning-light); color: #4f46e5; }
-.tag-danger  { background: var(--danger-light); color: #dc2626; }
+.tag-primary { background: #1d4ed8; color: #fff; }
+.tag-info    { background: #0d9488; color: #fff; }
+.tag-success { background: #0369a1; color: #fff; }
+.tag-warning { background: #4f46e5; color: #fff; }
+.tag-danger  { background: #b91c1c; color: #fff; }
 
 /* ----- 提示 ----- */
 .alert {
@@ -303,6 +305,7 @@ select.form-control {
   border-radius: var(--radius); padding: 22px;
   box-shadow: var(--glass-shadow);
   transition: transform .25s ease, box-shadow .25s ease;
+  text-shadow: 0 0 1px rgba(255,255,255,.6);
 }
 .stat-card:hover {
   transform: translateY(-3px);

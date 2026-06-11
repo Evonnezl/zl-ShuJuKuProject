@@ -36,6 +36,24 @@
       </div>
     </div>
 
+    <!-- 图表区 -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px;">
+      <div class="glass-card" style="padding:16px;">
+        <div class="card-title">房屋状态分布</div>
+        <div ref="pieChart" style="width:100%; height:300px;"></div>
+      </div>
+      <div class="glass-card" style="padding:16px;">
+        <div class="card-title">各面积段房屋数量</div>
+        <div ref="areaBarChart" style="width:100%; height:300px;"></div>
+      </div>
+    </div>
+
+    <!-- 租金对比图 -->
+    <div class="glass-card" style="padding:16px; margin-bottom:20px;">
+      <div class="card-title">房屋月租金对比</div>
+      <div ref="rentBarChart" style="width:100%; height:400px;"></div>
+    </div>
+
     <!-- 查询工具 -->
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
       <!-- 按面积查询阈值 -->
@@ -92,8 +110,8 @@
               <td class="col-right">{{ item.rent_per_m2 }} 元</td>
               <td class="col-right">{{ item.monthly_rent }} 元</td>
               <td>
-                <span class="tag" :class="item.status === '空房' ? 'tag-success' : 'tag-warning'">
-                  {{ item.status }}
+                <span class="tag" :class="(item.status === '空房' || item.status === 'empty') ? 'tag-success' : 'tag-warning'">
+                  {{ item.status === 'empty' ? '空房' : item.status }}
                 </span>
               </td>
             </tr>
@@ -109,6 +127,8 @@
 </template>
 
 <script>
+import * as echarts from 'echarts'
+
 export default {
   data() {
     return {
@@ -128,8 +148,128 @@ export default {
     load() {
       fetch('http://localhost:8080/stats')
         .then(res => res.json())
-        .then(data => { this.stats = data })
+        .then(data => {
+          this.stats = data
+          this.$nextTick(() => {
+            this.renderPieChart()
+            this.renderAreaBarChart()
+            this.renderRentBarChart()
+          })
+        })
         .catch(err => console.error('加载统计失败', err))
+    },
+
+    renderPieChart() {
+      const el = this.$refs.pieChart
+      if (!el) return
+      const chart = echarts.init(el)
+      chart.setOption({
+        tooltip: { trigger: 'item' },
+        legend: { bottom: 0, textStyle: { color: '#000' } },
+        series: [{
+          type: 'pie',
+          radius: ['45%', '75%'],
+          center: ['50%', '45%'],
+          avoidLabelOverlap: false,
+          itemStyle: {
+            borderRadius: 6,
+            borderColor: 'rgba(255,255,255,.8)',
+            borderWidth: 3
+          },
+          label: { show: true, formatter: '{b}\n{d}%' },
+          data: [
+            { value: this.stats.emptyHouse || 0, name: '空房', itemStyle: { color: '#38bdf8' } },
+            { value: this.stats.allocatedHouse || 0, name: '已分配', itemStyle: { color: '#818cf8' } }
+          ]
+        }]
+      })
+    },
+
+    renderAreaBarChart() {
+      const el = this.$refs.areaBarChart
+      if (!el) return
+      const houses = this.stats.houseRentInfo || []
+      const ranges = [
+        { label: '0~60㎡', min: 0, max: 60 },
+        { label: '60~80㎡', min: 60, max: 80 },
+        { label: '80~120㎡', min: 80, max: 120 },
+        { label: '120~160㎡', min: 120, max: 999 }
+      ]
+      const counts = ranges.map(r => houses.filter(h => h.area > r.min && h.area <= r.max).length)
+
+      const chart = echarts.init(el)
+      chart.setOption({
+        tooltip: { trigger: 'axis' },
+        xAxis: {
+          type: 'category',
+          data: ranges.map(r => r.label),
+          axisLabel: { color: '#000' }
+        },
+        yAxis: {
+          type: 'value',
+          name: '套数',
+          axisLabel: { color: '#000' }
+        },
+        series: [{
+          type: 'bar',
+          data: counts,
+          barWidth: '50%',
+          itemStyle: {
+            borderRadius: [8, 8, 0, 0],
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              { offset: 0, color: '#60a5fa' },
+              { offset: 1, color: '#3b82f6' }
+            ])
+          },
+          label: { show: true, position: 'top', color: '#000', fontWeight: 'bold' }
+        }]
+      })
+    },
+
+    renderRentBarChart() {
+      const el = this.$refs.rentBarChart
+      if (!el) return
+      const houses = (this.stats.houseRentInfo || []).slice().sort((a, b) => b.monthly_rent - a.monthly_rent)
+
+      const chart = echarts.init(el)
+      chart.setOption({
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: { type: 'shadow' }
+        },
+        grid: { left: '3%', right: '10%', bottom: '3%', containLabel: true },
+        xAxis: {
+          type: 'value',
+          name: '元/月',
+          axisLabel: { color: '#000' }
+        },
+        yAxis: {
+          type: 'category',
+          data: houses.map(h => h.title),
+          axisLabel: { color: '#000', fontWeight: 'bold' },
+          inverse: true
+        },
+        series: [{
+          type: 'bar',
+          data: houses.map(h => ({
+            value: h.monthly_rent,
+            itemStyle: {
+              color: h.status === '空房' || h.status === 'empty'
+                ? new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+                    { offset: 0, color: '#38bdf8' }, { offset: 1, color: '#0ea5e9' }
+                  ])
+                : new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+                    { offset: 0, color: '#818cf8' }, { offset: 1, color: '#6366f1' }
+                  ])
+            }
+          })),
+          barWidth: '60%',
+          itemStyle: {
+            borderRadius: [0, 6, 6, 0]
+          },
+          label: { show: true, position: 'right', color: '#000', formatter: '{c} 元' }
+        }]
+      })
     },
 
     queryThreshold() {

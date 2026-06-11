@@ -55,8 +55,8 @@
               <td>{{ item.id }}</td>
               <td><strong>{{ item.title }}</strong></td>
               <td>
-                <span class="tag" :class="item.status === '空房' ? 'tag-success' : 'tag-warning'">
-                  {{ item.status }}
+                <span class="tag" :class="(item.status === '空房' || item.status === 'empty') ? 'tag-success' : 'tag-warning'">
+                  {{ item.status === 'empty' ? '空房' : item.status }}
                 </span>
               </td>
               <td class="col-center">{{ item.area }}</td>
@@ -124,7 +124,7 @@ export default {
     load() {
       fetch('http://localhost:8080/houses')
         .then(res => res.json())
-        .then(data => { this.list = data })
+        .then(data => { this.list = data.sort((a, b) => a.area - b.area) })
         .catch(err => console.error('加载房屋列表失败', err))
     },
 
