@@ -272,7 +272,7 @@ public class ApplicationService {
         }
 
         // 分配新房（调用分房逻辑）
-        return approve(id);
+        return doAllocate(app);
     }
 
     // ==================== 退房 ====================

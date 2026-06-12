@@ -5,27 +5,58 @@
 
 <mapper namespace="org.example.housebackend.mapper.UserMapper">
 
-    <select id="getAllUsers" resultType="org.example.housebackend.entity.User">
-        SELECT id, name, role, phone, email
+    <!-- ========== ResultMap：email/phone 通过 TypeHandler 自动解密 ========== -->
+    <resultMap id="userResultMap" type="org.example.housebackend.entity.User">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="role" property="role"/>
+        <!-- 加密字段：读取时自动解密，写入时自动加密 -->
+        <result column="phone" property="phone"
+                typeHandler="org.example.housebackend.typehandler.EncryptedStringTypeHandler"/>
+        <result column="email" property="email"
+                typeHandler="org.example.housebackend.typehandler.EncryptedStringTypeHandler"/>
+        <result column="password" property="password"/>
+        <result column="email_hash" property="emailHash"/>
+        <result column="phone_hash" property="phoneHash"/>
+    </resultMap>
+
+    <!-- ========== 查询（不含密码） ========== -->
+    <select id="getAllUsers" resultMap="userResultMap">
+        SELECT id, name, role, phone, email, password, email_hash, phone_hash
         FROM user
     </select>
 
-    <select id="getById" resultType="org.example.housebackend.entity.User">
-        SELECT id, name, role, phone, email
+    <select id="getById" resultMap="userResultMap">
+        SELECT id, name, role, phone, email, password, email_hash, phone_hash
         FROM user
         WHERE id = #{id}
     </select>
 
-    <select id="findByName" resultType="org.example.housebackend.entity.User">
-        SELECT id, name, role, phone, email, password
+    <!-- ========== 查询（含密码，用于登录验证） ========== -->
+    <select id="findByName" resultMap="userResultMap">
+        SELECT id, name, role, phone, email, password, email_hash, phone_hash
         FROM user
         WHERE name = #{name}
         LIMIT 1
     </select>
 
+    <!-- 通过 SHA-256 哈希查找邮箱（email 列已加密，无法直接 WHERE email = ?） -->
+    <select id="findByEmailHash" resultMap="userResultMap">
+        SELECT id, name, role, phone, email, password, email_hash, phone_hash
+        FROM user
+        WHERE email_hash = #{hash}
+        LIMIT 1
+    </select>
+
+    <!-- ========== 写入（通过 TypeHandler 自动加密 email/phone） ========== -->
     <insert id="insertUser">
-        INSERT INTO user(name, role, phone, email, password)
-        VALUES (#{name}, #{role}, #{phone}, #{email}, #{password})
+        INSERT INTO user(name, role, phone, email, password, email_hash, phone_hash)
+        VALUES (#{name}, #{role},
+                #{phone, typeHandler=org.example.housebackend.typehandler.EncryptedStringTypeHandler},
+                #{email, typeHandler=org.example.housebackend.typehandler.EncryptedStringTypeHandler},
+                #{password},
+                #{emailHash},
+                #{phoneHash})
     </insert>
 
     <update id="updateUser">
@@ -33,9 +64,11 @@
         <set>
             <if test="name != null">name = #{name},</if>
             <if test="role != null">role = #{role},</if>
-            <if test="phone != null">phone = #{phone},</if>
-            <if test="email != null">email = #{email},</if>
+            <if test="phone != null">phone = #{phone, typeHandler=org.example.housebackend.typehandler.EncryptedStringTypeHandler},</if>
+            <if test="email != null">email = #{email, typeHandler=org.example.housebackend.typehandler.EncryptedStringTypeHandler},</if>
             <if test="password != null">password = #{password},</if>
+            <if test="emailHash != null">email_hash = #{emailHash},</if>
+            <if test="phoneHash != null">phone_hash = #{phoneHash},</if>
         </set>
         WHERE id = #{id}
     </update>

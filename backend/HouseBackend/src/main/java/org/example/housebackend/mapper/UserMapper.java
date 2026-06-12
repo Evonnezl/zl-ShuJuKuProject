@@ -1,6 +1,7 @@
 package org.example.housebackend.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 import org.example.housebackend.entity.User;
 
 import java.util.List;
@@ -20,9 +21,9 @@ public interface UserMapper {
 
     User findByName(String name);
 
-    @org.apache.ibatis.annotations.Select("SELECT id, name, role, phone, email, password FROM user WHERE email = #{email} LIMIT 1")
-    User findByEmail(String email);
+    // 通过 SHA-256 哈希查找（email 字段已加密，无法直接 WHERE email = ?）
+    User findByEmailHash(String hash);
 
-    @org.apache.ibatis.annotations.Select("SELECT id, name, role, phone, email, password FROM user WHERE id = #{id} LIMIT 1")
+    @Select("SELECT id, name, role, phone, email, password FROM user WHERE id = #{id} LIMIT 1")
     User getFullById(Integer id);
 }
